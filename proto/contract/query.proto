@@ -4,12 +4,36 @@ package jack139.contract.contract;
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
+import "contract/contract.proto";
 
 option go_package = "github.com/jack139/contract/x/contract/types";
 
 // Query defines the gRPC querier service.
 service Query {
     // this line is used by starport scaffolding # 2
+	rpc Contract(QueryGetContractRequest) returns (QueryGetContractResponse) {
+		option (google.api.http).get = "/jack139/contract/contract/contract/{id}";
+	}
+	rpc ContractAll(QueryAllContractRequest) returns (QueryAllContractResponse) {
+		option (google.api.http).get = "/jack139/contract/contract/contract";
+	}
+
 }
 
 // this line is used by starport scaffolding # 3
+message QueryGetContractRequest {
+	string id = 1;
+}
+
+message QueryGetContractResponse {
+	Contract Contract = 1;
+}
+
+message QueryAllContractRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllContractResponse {
+	repeated Contract Contract = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

@@ -1,0 +1,40 @@
+syntax = "proto3";
+package jack139.contract.contract;
+
+option go_package = "github.com/jack139/contract/x/contract/types";
+
+import "gogoproto/gogo.proto";
+
+message Contract {
+  string creator = 1;
+  string id = 2;
+  string contractNo = 3; 
+  string partyA = 4; 
+  string partyB = 5; 
+  string action = 6; 
+  string data = 7; 
+}
+
+message MsgCreateContract {
+  string creator = 1;
+  string contractNo = 2; 
+  string partyA = 3; 
+  string partyB = 4; 
+  string action = 5; 
+  string data = 6; 
+}
+
+message MsgUpdateContract {
+  string creator = 1;
+  string id = 2;
+  string contractNo = 3; 
+  string partyA = 4; 
+  string partyB = 5; 
+  string action = 6; 
+  string data = 7; 
+}
+
+message MsgDeleteContract {
+  string creator = 1;
+  string id = 2;
+}
