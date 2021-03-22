@@ -3,13 +3,14 @@ package keeper
 import (
 	"context"
 
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/jack139/contract/x/contract/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+/*  具体查询使用contract.go中定义，算法同源 */
+
 
 func (k Keeper) ContractAll(c context.Context, req *types.QueryAllContractRequest) (*types.QueryAllContractResponse, error) {
 	if req == nil {
@@ -19,25 +20,14 @@ func (k Keeper) ContractAll(c context.Context, req *types.QueryAllContractReques
 	var contracts []*types.Contract
 	ctx := sdk.UnwrapSDKContext(c)
 
-	store := ctx.KVStore(k.storeKey)
-	contractStore := prefix.NewStore(store, types.KeyPrefix(types.ContractKey))
-
-	pageRes, err := query.Paginate(contractStore, req.Pagination, func(key []byte, value []byte) error {
-		var contract types.Contract
-		if err := k.cdc.UnmarshalBinaryBare(value, &contract); err != nil {
-			return err
-		}
-
-		contracts = append(contracts, &contract)
-		return nil
-	})
-
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	r := k.GetAllContract(ctx)
+	for _, c := range r{
+		contracts = append(contracts, &c)
 	}
 
-	return &types.QueryAllContractResponse{Contract: contracts, Pagination: pageRes}, nil
+	return &types.QueryAllContractResponse{Contract: contracts}, nil
 }
+
 
 func (k Keeper) Contract(c context.Context, req *types.QueryGetContractRequest) (*types.QueryGetContractResponse, error) {
 	if req == nil {
@@ -47,8 +37,25 @@ func (k Keeper) Contract(c context.Context, req *types.QueryGetContractRequest) 
 	var contract types.Contract
 	ctx := sdk.UnwrapSDKContext(c)
 
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ContractKey))
-	k.cdc.MustUnmarshalBinaryBare(store.Get(types.KeyPrefix(types.ContractKey+req.Id)), &contract)
+	contract = k.GetContract(ctx, req.Id)
 
 	return &types.QueryGetContractResponse{Contract: &contract}, nil
+}
+
+
+
+func (k Keeper) ContractByNo(c context.Context, req *types.QueryGetContractByNoRequest) (*types.QueryGetContractByNoResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	var contracts []*types.Contract
+	ctx := sdk.UnwrapSDKContext(c)
+
+	r := k.GetContractByNo(ctx, req.ContractNo)
+	for _, c := range r{
+		contracts = append(contracts, &c)
+	}
+
+	return &types.QueryGetContractByNoResponse{Contract: contracts}, nil
 }

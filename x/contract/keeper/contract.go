@@ -74,6 +74,7 @@ func (k Keeper) GetContract(ctx sdk.Context, key string) types.Contract {
 	return contract
 }
 
+
 // HasContract checks if the contract exists
 func (k Keeper) HasContract(ctx sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ContractKey))
@@ -102,6 +103,25 @@ func (k Keeper) GetAllContract(ctx sdk.Context) (msgs []types.Contract) {
 		var msg types.Contract
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &msg)
 		msgs = append(msgs, msg)
+	}
+
+	return
+}
+
+
+// GetAllContract returns all contract with spicific contractNo
+func (k Keeper) GetContractByNo(ctx sdk.Context, contractNo string) (msgs []types.Contract) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ContractKey))
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefix(types.ContractKey))
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var msg types.Contract
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &msg)
+		if msg.ContractNo==contractNo{
+			msgs = append(msgs, msg)
+		}
 	}
 
 	return

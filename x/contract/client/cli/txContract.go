@@ -11,7 +11,7 @@ import (
 
 func CmdCreateContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-contract [contractNo] [partyA] [partyB] [action] [data]",
+		Use:   "create [contractNo] [partyA] [partyB] [action] [data]",
 		Short: "Creates a new contract",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {

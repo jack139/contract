@@ -15,7 +15,7 @@ const (
 func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 2
 	registerQueryRoutes(clientCtx, r)
-	registerTxHandlers(clientCtx, r)
+	//registerTxHandlers(clientCtx, r)  // 不注册交易处理的http，另外实现
 
 }
 

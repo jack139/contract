@@ -11,20 +11,14 @@ import (
 
 func CmdListContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-contract",
+		Use:   "list",
 		Short: "list all contract",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
-			if err != nil {
-				return err
-			}
-
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryAllContractRequest{
-				Pagination: pageReq,
 			}
 
 			res, err := queryClient.ContractAll(context.Background(), params)
@@ -43,7 +37,7 @@ func CmdListContract() *cobra.Command {
 
 func CmdShowContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-contract [id]",
+		Use:   "show [id]",
 		Short: "shows a contract",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -56,6 +50,34 @@ func CmdShowContract() *cobra.Command {
 			}
 
 			res, err := queryClient.Contract(context.Background(), params)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdShowByNoContract() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "show-by-no [contractNo]",
+		Short: "shows a contract by contract No.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QueryGetContractByNoRequest{
+				ContractNo: args[0],
+			}
+
+			res, err := queryClient.ContractByNo(context.Background(), params)
 			if err != nil {
 				return err
 			}

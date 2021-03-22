@@ -27,3 +27,16 @@ func getContract(ctx sdk.Context, id string, keeper Keeper, legacyQuerierCdc *co
 
 	return bz, nil
 }
+
+/*
+func getContractByNo(ctx sdk.Context, contractNo string, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+	msg := keeper.GetContractByNo(ctx, contractNo)
+
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, msg)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
+
+	return bz, nil
+}
+*/

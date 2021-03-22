@@ -17,6 +17,10 @@ service Query {
 	rpc ContractAll(QueryAllContractRequest) returns (QueryAllContractResponse) {
 		option (google.api.http).get = "/jack139/contract/contract/contract";
 	}
+	rpc ContractByNo(QueryGetContractByNoRequest) returns (QueryGetContractByNoResponse) {
+		option (google.api.http).get = "/jack139/contract/contract/contract/{contractNo}";
+	}
+
 
 }
 
@@ -29,11 +33,17 @@ message QueryGetContractResponse {
 	Contract Contract = 1;
 }
 
+message QueryGetContractByNoRequest {
+	string contractNo = 1;
+}
+
+message QueryGetContractByNoResponse {
+	repeated Contract Contract = 1;
+}
+
 message QueryAllContractRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
 message QueryAllContractResponse {
 	repeated Contract Contract = 1;
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
