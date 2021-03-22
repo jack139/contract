@@ -21,8 +21,8 @@ func (k Keeper) ContractAll(c context.Context, req *types.QueryAllContractReques
 	ctx := sdk.UnwrapSDKContext(c)
 
 	r := k.GetAllContract(ctx)
-	for _, c := range r{
-		contracts = append(contracts, &c)
+	for i, _ := range r{
+		contracts = append(contracts, &r[i])
 	}
 
 	return &types.QueryAllContractResponse{Contract: contracts}, nil
@@ -53,8 +53,8 @@ func (k Keeper) ContractByNo(c context.Context, req *types.QueryGetContractByNoR
 	ctx := sdk.UnwrapSDKContext(c)
 
 	r := k.GetContractByNo(ctx, req.ContractNo)
-	for _, c := range r{
-		contracts = append(contracts, &c)
+	for i, _ := range r{
+		contracts = append(contracts, &r[i])
 	}
 
 	return &types.QueryGetContractByNoResponse{Contract: contracts}, nil
