@@ -11,13 +11,13 @@ contractd init test
 #contractd config chain-id namechain
 #contractd config keyring-backend test
 
+contractd keys add user0
 contractd keys add user1
-contractd keys add user2
 
-contractd add-genesis-account $(contractd keys show user1 -a) 1000nametoken,100000000stake
-contractd add-genesis-account $(contractd keys show user2 -a) 1000nametoken,100000000stake
+contractd add-genesis-account $(contractd keys show user0 -a) 1000nametoken,100000000stake,10000000credit
+contractd add-genesis-account $(contractd keys show user1 -a) 500nametoken,500credit
 
-contractd gentx user1 100000000stake --chain-id contract
+contractd gentx user0 100000000stake --chain-id contract
 
 echo "Collecting genesis txs..."
 contractd collect-gentxs

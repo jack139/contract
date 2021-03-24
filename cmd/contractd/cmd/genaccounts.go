@@ -218,22 +218,47 @@ func AddUserCmd(defaultNodeHome string) *cobra.Command {
 
 // 建新用户 user， 建key，建account
 func AddUserAccount(cmd *cobra.Command, name string) error {
-
-	addr0 := "contract1zfqgxtujvpy92prtzgmzs3ygta9y2cl3w8hxlh"
-	cmd.Flags().Set(flags.FlagFrom, addr0)
+	
 	clientCtx, err := client.GetClientTxContext(cmd)
 	if err != nil {
 		return err
 	}
 
-	// ---------------  add key --------------------
+	// 获取 keyring 环境
 	var kb keyring.Keyring
 
 	buf := bufio.NewReader(cmd.InOrStdin())
-	backend := "test"
-	kb, err = keyring.New(sdk.KeyringServiceName(), backend, clientCtx.KeyringDir, buf)
+	keyringBackend, err := cmd.Flags().GetString(flags.FlagKeyringBackend)
+	if err != nil {
+		return err
+	}
+	kb, err = keyring.New(sdk.KeyringServiceName(), keyringBackend, clientCtx.KeyringDir, buf)
 
+	// 获取 user0的地址
+	keyref := "user0"
+	info0, err := kb.Key(keyref)
+	if err != nil {
+		return err
+	}
+	//addr0 := info0.GetAddress()
 
+	// 参考cosmos-sdk/client/keys/show.go 中 getBechKeyOut()
+	ko, err := keyring.Bech32KeyOutput(info0)  
+	if err != nil {
+		return err
+	}
+
+	// 取得地址字符串： 例如 contract1zfqgxtujvpy92prtzgmzs3ygta9y2cl3w8hxlh
+	addr0 := ko.Address
+	//fmt.Println(addr0)
+
+	cmd.Flags().Set(flags.FlagFrom, addr0)
+	clientCtx, err = client.GetClientTxContext(cmd) // 设置了addr0, 重新获取一次context
+	if err != nil {
+		return err
+	}
+
+	// 注册新的 key
 	keyringAlgos, _ := kb.SupportedAlgorithms()
 	algo, err := keyring.NewSigningAlgoFromString(string(hd.Secp256k1Type), keyringAlgos)
 	if err != nil {
@@ -262,38 +287,20 @@ func AddUserAccount(cmd *cobra.Command, name string) error {
 		return err
 	}
 
-	fmt.Println(mnemonic)
-	fmt.Println(info)
+	fmt.Println("mnemonic: ", mnemonic)
+	//fmt.Println(info)
 
-	// ---------------  add account --------------------
-
-
+	// 新用户的 地址
 	toAddr := info.GetAddress()
-	//addr0 := "contract1zfqgxtujvpy92prtzgmzs3ygta9y2cl3w8hxlh"
-	//cmd.Flags().Set(flags.FlagFrom, addr0)
-	//clientCtx, err := client.GetClientTxContext(cmd)
-	//if err != nil {
-	//	return err
-	//}
 
-	//fromAddr, err := sdk.AccAddressFromBech32(addr0)
-	//if err != nil {
-	//	return err
-	//}
+	//fmt.Println("from ", clientCtx.GetFromAddress())
+	//fmt.Println("to ", toAddr)
 
-	//toAddr, err := sdk.AccAddressFromBech32("contract16tv3em4tjy9yssdet84auted96vegdfw8h5cue")
-	//if err != nil {
-	//	return err
-	//}
-
-
-	coins, err := sdk.ParseCoinsNormalized("1token")
+	// 转账 1credit， 会自动建立auth的账户
+	coins, err := sdk.ParseCoinsNormalized("1credit")
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("from ", clientCtx.GetFromAddress())
-	fmt.Println("to ", toAddr)
 
 	msg := banktypes.NewMsgSend(clientCtx.GetFromAddress(), toAddr, coins)
 	if err := msg.ValidateBasic(); err != nil {
@@ -301,6 +308,7 @@ func AddUserAccount(cmd *cobra.Command, name string) error {
 		return err
 	}
 
+	// 调用 send 的 RPC 服务
 	return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 
 }
