@@ -153,6 +153,7 @@ func txCommand() *cobra.Command {
 		authcmd.GetDecodeCommand(),
 		flags.LineBreak,
 		vestingcli.GetTxCmd(),
+		AddUserCmd(app.DefaultNodeHome),
 	)
 
 	app.ModuleBasics.AddTxCommands(cmd)

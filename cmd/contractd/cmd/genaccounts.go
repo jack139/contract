@@ -8,9 +8,11 @@ import (
 
 	"github.com/spf13/cobra"
 
+	bip39 "github.com/cosmos/go-bip39"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,6 +21,8 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
+
+	"github.com/cosmos/cosmos-sdk/client/tx"
 )
 
 const (
@@ -189,4 +193,114 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
+}
+
+
+
+
+// 添加用户： add key and account
+func AddUserCmd(defaultNodeHome string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "add-user [user_name]",
+		Short: "Add a user to chain",
+		Long: `Add a user to chain. `,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return AddUserAccount(cmd, args[0])
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+
+// 建新用户 user， 建key，建account
+func AddUserAccount(cmd *cobra.Command, name string) error {
+
+	addr0 := "contract1zfqgxtujvpy92prtzgmzs3ygta9y2cl3w8hxlh"
+	cmd.Flags().Set(flags.FlagFrom, addr0)
+	clientCtx, err := client.GetClientTxContext(cmd)
+	if err != nil {
+		return err
+	}
+
+	// ---------------  add key --------------------
+	var kb keyring.Keyring
+
+	buf := bufio.NewReader(cmd.InOrStdin())
+	backend := "test"
+	kb, err = keyring.New(sdk.KeyringServiceName(), backend, clientCtx.KeyringDir, buf)
+
+
+	keyringAlgos, _ := kb.SupportedAlgorithms()
+	algo, err := keyring.NewSigningAlgoFromString(string(hd.Secp256k1Type), keyringAlgos)
+	if err != nil {
+		return err
+	}
+
+	hdPath := hd.CreateHDPath(sdk.GetConfig().GetCoinType(), 0, 0).String()
+
+	// read entropy seed straight from tmcrypto.Rand and convert to mnemonic
+	mnemonicEntropySize := 256
+	entropySeed, err := bip39.NewEntropy(mnemonicEntropySize)
+	if err != nil {
+		return err
+	}
+
+	// Get bip39 mnemonic
+	var mnemonic, bip39Passphrase string
+
+	mnemonic, err = bip39.NewMnemonic(entropySeed)
+	if err != nil {
+		return err
+	}
+
+	info, err := kb.NewAccount(name, mnemonic, bip39Passphrase, hdPath, algo)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(mnemonic)
+	fmt.Println(info)
+
+	// ---------------  add account --------------------
+
+
+	toAddr := info.GetAddress()
+	//addr0 := "contract1zfqgxtujvpy92prtzgmzs3ygta9y2cl3w8hxlh"
+	//cmd.Flags().Set(flags.FlagFrom, addr0)
+	//clientCtx, err := client.GetClientTxContext(cmd)
+	//if err != nil {
+	//	return err
+	//}
+
+	//fromAddr, err := sdk.AccAddressFromBech32(addr0)
+	//if err != nil {
+	//	return err
+	//}
+
+	//toAddr, err := sdk.AccAddressFromBech32("contract16tv3em4tjy9yssdet84auted96vegdfw8h5cue")
+	//if err != nil {
+	//	return err
+	//}
+
+
+	coins, err := sdk.ParseCoinsNormalized("1token")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("from ", clientCtx.GetFromAddress())
+	fmt.Println("to ", toAddr)
+
+	msg := banktypes.NewMsgSend(clientCtx.GetFromAddress(), toAddr, coins)
+	if err := msg.ValidateBasic(); err != nil {
+		fmt.Print("3", err)
+		return err
+	}
+
+	return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+
 }
