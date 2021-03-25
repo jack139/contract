@@ -235,7 +235,7 @@ func AddUserAccount(cmd *cobra.Command, name string) error {
 	kb, err = keyring.New(sdk.KeyringServiceName(), keyringBackend, clientCtx.KeyringDir, buf)
 
 	// 获取 user0的地址
-	keyref := "user0"
+	keyref := "faucet"
 	info0, err := kb.Key(keyref)
 	if err != nil {
 		return err
@@ -297,7 +297,7 @@ func AddUserAccount(cmd *cobra.Command, name string) error {
 	//fmt.Println("to ", toAddr)
 
 	// 转账 1credit， 会自动建立auth的账户
-	coins, err := sdk.ParseCoinsNormalized("1credit")
+	coins, err := sdk.ParseCoinsNormalized("20credit")
 	if err != nil {
 		return err
 	}

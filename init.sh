@@ -12,10 +12,12 @@ contractd init test
 #contractd config keyring-backend test
 
 contractd keys add user0
-contractd keys add user1
+contractd keys add gt
+contractd keys add faucet
 
-contractd add-genesis-account $(contractd keys show user0 -a) 1000nametoken,100000000stake,10000000credit
-contractd add-genesis-account $(contractd keys show user1 -a) 500nametoken,500credit
+contractd add-genesis-account $(contractd keys show user0 -a) 500token,100000000stake,500credit
+contractd add-genesis-account $(contractd keys show gt -a) 500token,500credit
+contractd add-genesis-account $(contractd keys show faucet -a) 10000000credit
 
 contractd gentx user0 100000000stake --chain-id contract
 
