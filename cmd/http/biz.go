@@ -1,14 +1,18 @@
 package http
 
 import (
-	//"github.com/jack139/contract/cmd/ipfs"
+	"github.com/jack139/contract/cmd/ipfs"
 	cmdclient "github.com/jack139/contract/cmd/client"
+	"github.com/jack139/contract/x/contract/types"
 
 	//"strconv"
 	"log"
-	//"encoding/json"
+	"encoding/json"
 	//"encoding/base64"
 	"github.com/valyala/fasthttp"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 )
 
 /* 企业链业务处理 */
@@ -66,14 +70,14 @@ func bizRegister(ctx *fasthttp.RequestCtx) {
 /* 签合同 */
 func bizContract(ctx *fasthttp.RequestCtx) {
 	log.Println("biz_contract")
-	//doContractDelivery(ctx, 11)
+	doContractDelivery(ctx, "11")
 }
 
 
 /* 验收 */
 func bizDelivery(ctx *fasthttp.RequestCtx) {
 	log.Println("biz_delivery")
-	//doContractDelivery(ctx, 12)
+	doContractDelivery(ctx, "12")
 }
 
 
@@ -81,8 +85,8 @@ func bizDelivery(ctx *fasthttp.RequestCtx) {
 	action： 11 前合同  12 验收 
 */
 
-/*
-func doContractDelivery(ctx *fasthttp.RequestCtx, action int) {
+
+func doContractDelivery(ctx *fasthttp.RequestCtx, action string) {
 	// POST 的数据
 	content := ctx.PostBody()
 
@@ -119,6 +123,7 @@ func doContractDelivery(ctx *fasthttp.RequestCtx, action int) {
 		return		
 	}
 
+	/*
 	// 获取用户密钥
 	meA, ok := SECRET_KEY[pubkeyA]
 	if !ok {
@@ -132,6 +137,7 @@ func doContractDelivery(ctx *fasthttp.RequestCtx, action int) {
 		respError(ctx, 9011, "wrong userkey_b")
 		return
 	}
+	*/
 
 	// data 存 ipfs
 	var cid string
@@ -155,6 +161,27 @@ func doContractDelivery(ctx *fasthttp.RequestCtx, action int) {
 		return
 	}
 
+	// 数据上链
+	clientCtx, err := client.GetClientTxContext(HttpCmd)
+	if err != nil {
+		respError(ctx, 9009, err.Error())
+		return
+	}
+
+	msg := types.NewMsgCreateContract(clientCtx.GetFromAddress().String(), 
+						assetsId, pubkeyA, pubkeyB, action, string(loadBytes))
+	if err := msg.ValidateBasic(); err != nil {
+		respError(ctx, 9010, err.Error())
+		return
+	}
+	err = tx.GenerateOrBroadcastTxCLI(clientCtx, HttpCmd.Flags(), msg)
+	if err != nil {
+		respError(ctx, 9011, err.Error())
+		return		
+	}
+
+
+	/*
 	// 提交交易, A B 两个用户都提交
 	respBytesA, err := meA.Deal(strconv.Itoa(action), assetsId, string(loadBytes), "") 
 	if err != nil {
@@ -179,15 +206,15 @@ func doContractDelivery(ctx *fasthttp.RequestCtx, action int) {
 		respError(ctx, 9005, err.Error())
 		return
 	}
+	*/
 
 	// 返回两个区块id
 	resp := map[string] interface{} {
-		"block_a" : respDataA,
-		"block_b" : respDataB,
+		"block_a" : "",
+		"block_b" : "",
 	}
 
 	respJson(ctx, &resp)
 
 }
 
-*/
