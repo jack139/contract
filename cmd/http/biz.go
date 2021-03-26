@@ -2,6 +2,7 @@ package http
 
 import (
 	//"github.com/jack139/contract/cmd/ipfs"
+	cmdclient "github.com/jack139/contract/cmd/client"
 
 	//"strconv"
 	"log"
@@ -16,7 +17,7 @@ import (
 	action == 13
 */
 
-/*
+
 func bizRegister(ctx *fasthttp.RequestCtx) {
 	log.Println("biz_register")
 
@@ -36,63 +37,30 @@ func bizRegister(ctx *fasthttp.RequestCtx) {
 		respError(ctx, 9001, "need user_name")
 		return
 	}
-	userType, ok := (*reqData)["user_type"].(string)
-	if !ok {
-		respError(ctx, 9002, "need user_type")
-		return
-	}
-	referrer, _ := (*reqData)["referrer"].(string)
+	//userType, ok := (*reqData)["user_type"].(string)
+	//if !ok {
+	//	respError(ctx, 9002, "need user_type")
+	//	return
+	//}
+	//referrer, _ := (*reqData)["referrer"].(string)
 
 	// 生成新用户密钥
-	path := userKeyfilePath+"/"+userName
-	me, err := client.GenUserKey(path)
-	if err!=nil {
-		respError(ctx, 9006, "fail to generate key")
-		return
+	address, mnemonic, err := cmdclient.AddUserAccount(HttpCmd, userName)
+	if err != nil{
+		respError(ctx, 9009, err.Error())
+		return		
 	}
 
-	// 新密钥加入用户缓存
-	pubkey := base64.StdEncoding.EncodeToString(me.CryptoPair.PubKey[:])
-	SECRET_KEY[pubkey] = me // 保存用户信息
-
-	// 准备数据
-	var loadData = map[string]interface{}{
-		"user_name" : userName,
-		"user_type" : userType,
-		"referrer"  : referrer,
-	}
-	loadBytes, err := json.Marshal(loadData)
-	if err != nil {
-		respError(ctx, 9008, err.Error())
-		return
-	}
-
-	// 提交交易
-	// data --> user_name,  refer --> user_type
-	// user_type: "office" 事务所；"supplier" 供应商；"buyer" 企业用户
-	respBytes, err := me.Deal("13", "*", string(loadBytes), "") 
-	if err != nil {
-		respError(ctx, 9004, err.Error())
-		return
-	}
-
-	// 转换成map, 生成返回数据
-	var respData map[string]interface{}
-
-	if err := json.Unmarshal(respBytes, &respData); err != nil {
-		respError(ctx, 9005, err.Error())
-		return
-	}
-
-	// 返回两个区块id
+	// 返回区块id
 	resp := map[string] interface{} {
-		"block" : respData,
-		"userkey" : pubkey,
+		"block"   : map[string]interface{}{"id" : ""}, // 未来兼容旧接口，目前无数据返回
+		"userkey" : address,
+		"mnemonic" : mnemonic,
 	}
 
 	respJson(ctx, &resp)
 }
-*/
+
 
 
 /* 签合同 */

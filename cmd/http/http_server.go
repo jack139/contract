@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"time"
-	"errors"
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 	"github.com/Ferluci/fast-realip"
@@ -16,6 +15,7 @@ import (
 var (
 	output = log.New(os.Stdout, "", 0)
 	//userKeyfilePath string
+	HttpCmd *cobra.Command
 )
 
 // "github.com/AubSs/fasthttplogger"
@@ -49,7 +49,7 @@ func combined(req fasthttp.RequestHandler) fasthttp.RequestHandler {
 
 
 /* 入口 */
-func runServer(port string/*, userPath string*/) {
+func RunServer(port string/*, userPath string*/) {
 	// 装入用户appid和secret
 	//err := loadSecretKey(userPath)
 	//if err != nil {
@@ -69,7 +69,7 @@ func runServer(port string/*, userPath string*/) {
 	//r.POST("/api/query_raw_block", queryRawBlock)
 	//r.POST("/api/biz_contract", bizContract)
 	//r.POST("/api/biz_delivery", bizDelivery)
-	//r.POST("/api/biz_register", bizRegister)
+	r.POST("/api/biz_register", bizRegister)
 
 
 	fmt.Printf("start HTTP server at 0.0.0.0:%s\n", port)
@@ -89,20 +89,3 @@ func index(ctx *fasthttp.RequestCtx) {
 	ctx.WriteString("Hello world.")
 }
 
-
-func HttpCliCmd() *cobra.Command {
-	cmd := &cobra.Command{	// 启动http服务
-		Use:   "http <port>",
-		Short: "start http service",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return errors.New("need port number")
-			}
-			runServer(args[0])
-			// 不会返回
-			return nil
-		},
-	}
-
-	return cmd
-}

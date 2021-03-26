@@ -31,14 +31,14 @@ if __name__ == '__main__':
         'version'  : '1',
         'sign_type' : 'SHA256', 
         'data'     : {
-            'userkey'   : 'poCX4ig37Ljq4nTX6DjQlz9EgITtIhAONaok8PJ7fzw=',
-            'userkey_a' : 'poCX4ig37Ljq4nTX6DjQlz9EgITtIhAONaok8PJ7fzw=',
-            'userkey_b' : 'c4l1SkZiwkQsULUah6OPuei0LabubLxnni9tLM1T3Tk=',
-            'assets_id' : '123',
-            #'data'      : img_data, # 'zzzzzxxxxxxx',
-            'user_name' : '测试2',
+            #'userkey'   : 'poCX4ig37Ljq4nTX6DjQlz9EgITtIhAONaok8PJ7fzw=',
+            #'userkey_a' : 'poCX4ig37Ljq4nTX6DjQlz9EgITtIhAONaok8PJ7fzw=',
+            #'userkey_b' : 'c4l1SkZiwkQsULUah6OPuei0LabubLxnni9tLM1T3Tk=',
+            #'assets_id' : '123',
+            ##'data'      : img_data, # 'zzzzzxxxxxxx',
+            'user_name' : 'test',
             'user_type' : 'buyer',
-            'block_id'  : '9681ddbe-3830-44d1-b8af-a41f73a1346a', # 85c2d455-755d-461b-89fc-8a9327f8223a
+            #'block_id'  : '9681ddbe-3830-44d1-b8af-a41f73a1346a', # 85c2d455-755d-461b-89fc-8a9327f8223a
         }
     }
 
@@ -71,13 +71,13 @@ if __name__ == '__main__':
 
     host = 'http://%s:%s'%(hostname, port)
     #url = host+'/api/query_by_assets'
-    #url = host+'/api/biz_register'
+    url = host+'/api/biz_register'
     #url = host+'/api/biz_contract'
     #url = host+'/api/biz_delivery'
     #url = host+'/api/query_deals'
     #url = host+'/api/query_block'
     #url = host+'/api/query_raw_block'
-    url = host+'/api/test'
+    #url = host+'/api/test'
 
     start_time = datetime.now()
     r = pool.urlopen('POST', url, body=body)
