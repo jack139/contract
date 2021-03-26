@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-rm -rf ~/.nameserviced
-rm -rf ~/.nameservicecli
+rm -rf ~/.contract
 
-contractd init test
+contractd init node0
 
 #contractd config output json
 #contractd config indent true
@@ -28,4 +27,4 @@ echo "Validating genesis file..."
 contractd validate-genesis
 
 
-contract start
+contractd start --log_level warn
