@@ -23,37 +23,7 @@ var (
 		"1ff3a3d2c1a8c236423ea3fe7bbdcff6" : "ZDlmZjk2YmNlMTEyNDYzN2E4ZGRlMWJhMTYyZDcxZDIxMjRkYTIwZiAgLQo=",
 		"4fcf3871f4a023712bec9ed44ee4b709" : "MjdjNGQxNGU3NjA1OWI0MGVmODIyN2FkOTEwYTViNDQzYTNjNTIyNSAgLQo=",
 	}
-
-	/* userid 为 公钥base64 */
-	//SECRET_KEY = make(map[string]*client.User)
 )
-
-/* 装入用户密钥 */
-/*
-func loadSecretKey(path string) error{
-	files, err := ioutil.ReadDir(path)
-	if err != nil {
-		return err
-	}
-
-	for _, f := range files {
-		// 用户keyfile在子目录下
-		if !f.IsDir(){
-			continue
-		}
-		// 装入 keyfile
-		u, err := client.GetMe(path + "/" + f.Name())
-		if err!=nil {
-			return err
-		}
-
-		pubkey := base64.StdEncoding.EncodeToString(u.CryptoPair.PubKey[:])
-		SECRET_KEY[pubkey] = u // 保存用户信息
-	}
-
-	return nil
-}
-*/
 
 
 /* 返回值的 content-type */
@@ -112,9 +82,6 @@ func checkSign(content []byte) (*map[string]interface{}, error) {
 	if appId, ok = fields["appid"].(string); !ok {
 		return nil, fmt.Errorf("need appid")
 	}	
-	//if userId, ok = fields["userkey"].(string); !ok { // 链用户公钥base64
-	//	return nil, nil, fmt.Errorf("need userkey")
-	//}	
 	if version, ok = fields["version"].(string); !ok {
 		return nil, fmt.Errorf("need version")
 	}	
@@ -138,12 +105,6 @@ func checkSign(content []byte) (*map[string]interface{}, error) {
 	if !ok {
 		return nil, fmt.Errorf("wrong appId")
 	}
-
-	// 取得用户信息
-	//me, ok := SECRET_KEY[userId]
-	//if !ok {
-	//	return nil, nil, fmt.Errorf("wrong userId")
-	//}
 
 	// 检查版本
 	if version!="1" {

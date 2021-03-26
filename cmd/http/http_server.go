@@ -14,7 +14,6 @@ import (
 
 var (
 	output = log.New(os.Stdout, "", 0)
-	//userKeyfilePath string
 	HttpCmd *cobra.Command
 )
 
@@ -50,14 +49,6 @@ func combined(req fasthttp.RequestHandler) fasthttp.RequestHandler {
 
 /* 入口 */
 func RunServer(port string/*, userPath string*/) {
-	// 装入用户appid和secret
-	//err := loadSecretKey(userPath)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-
-	// 保存到全局变量，注册新用户时要用
-	//userKeyfilePath = userPath
 
 	/* router */
 	r := router.New()

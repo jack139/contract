@@ -53,7 +53,7 @@ func bizRegister(ctx *fasthttp.RequestCtx) {
 
 	// 返回区块id
 	resp := map[string] interface{} {
-		"block"   : map[string]interface{}{"id" : ""}, // 未来兼容旧接口，目前无数据返回
+		"block"   : map[string]interface{}{"id" : ""}, // 为了兼容旧接口，目前无数据返回
 		"userkey" : address,
 		"mnemonic" : mnemonic,
 	}
