@@ -7,6 +7,7 @@ import (
 
 	//"strconv"
 	"log"
+	"bytes"
 	"encoding/json"
 	//"encoding/base64"
 	"github.com/valyala/fasthttp"
@@ -123,22 +124,6 @@ func doContractDelivery(ctx *fasthttp.RequestCtx, action string) {
 		return		
 	}
 
-	/*
-	// 获取用户密钥
-	meA, ok := SECRET_KEY[pubkeyA]
-	if !ok {
-		respError(ctx, 9011, "wrong userkey_a")
-		return
-	}
-
-	// 获取用户密钥
-	meB, ok := SECRET_KEY[pubkeyB]
-	if !ok {
-		respError(ctx, 9011, "wrong userkey_b")
-		return
-	}
-	*/
-
 	// data 存 ipfs
 	var cid string
 	if len(data)>0 {
@@ -174,44 +159,44 @@ func doContractDelivery(ctx *fasthttp.RequestCtx, action string) {
 		respError(ctx, 9010, err.Error())
 		return
 	}
+
+	// 设置 接收输出
+	buf := new(bytes.Buffer)
+	clientCtx.Output = buf
+
 	err = tx.GenerateOrBroadcastTxCLI(clientCtx, HttpCmd.Flags(), msg)
 	if err != nil {
 		respError(ctx, 9011, err.Error())
 		return		
 	}
 
+	// 结果输出
+	respBytes := []byte(buf.String())
 
-	/*
-	// 提交交易, A B 两个用户都提交
-	respBytesA, err := meA.Deal(strconv.Itoa(action), assetsId, string(loadBytes), "") 
-	if err != nil {
-		respError(ctx, 9004, err.Error())
-		return
-	}
-	respBytesB, err := meB.Deal(strconv.Itoa(action), assetsId, string(loadBytes), "") 
-	if err != nil {
-		respError(ctx, 9004, err.Error())
-		return
-	}
+	log.Println("output: ", buf.String())
 
 	// 转换成map, 生成返回数据
-	var respDataA map[string]interface{}
-	var respDataB map[string]interface{}
+	var respData map[string]interface{}
 
-	if err := json.Unmarshal(respBytesA, &respDataA); err != nil {
-		respError(ctx, 9005, err.Error())
+	if err := json.Unmarshal(respBytes, &respData); err != nil {
+		respError(ctx, 9012, err.Error())
 		return
 	}
-	if err := json.Unmarshal(respBytesB, &respDataB); err != nil {
-		respError(ctx, 9005, err.Error())
+
+	// code==0 提交成功
+	if respData["code"].(float64)!=0 { 
+		respError(ctx, 9099, buf.String())  ///  提交失败
 		return
 	}
-	*/
 
-	// 返回两个区块id
+	//fmt.Printf("%s %s\n", respData["height"], respData["txhash"])
+
+	// 返回两个区块
 	resp := map[string] interface{} {
-		"block_a" : "",
-		"block_b" : "",
+		"block_a" : respData["txhash"].(string),  // 兼容旧接口
+		"block_b" : respData["txhash"].(string),  // 兼容旧接口
+		"height" : respData["height"].(string),
+		"txhash" : respData["txhash"].(string),
 	}
 
 	respJson(ctx, &resp)
