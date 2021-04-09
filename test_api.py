@@ -31,14 +31,15 @@ if __name__ == '__main__':
         'version'  : '1',
         'sign_type' : 'SHA256', 
         'data'     : {
-            'userkey'   : 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx',
-            #'userkey_a' : 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx',
+            #'userkey'   : 'contract18zfdsjzn8t500qu43cpxhr9szs226r88u8hly9', # user1
+            'userkey'   : 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', # test2
+            #'userkey_a' : 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex',
             #'userkey_b' : 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx',
-            'assets_id' : '123',
-            #'data'      : 'zzzzzxxxxxxx',
+            'assets_id' : '1234',
+            #'data'      : '11111111111111111111',
             #'user_name' : 'test',
             #'user_type' : 'buyer',
-            #'block_id'  : '9681ddbe-3830-44d1-b8af-a41f73a1346a', # 85c2d455-755d-461b-89fc-8a9327f8223a
+            #'block_id'  : '5FBFCE2740DAE30C2D960AEC834107D7F823DEDA9C003A0A2A83FECA51FE6D57', # txhash
         }
     }
 
@@ -70,11 +71,11 @@ if __name__ == '__main__':
     pool = urllib3.PoolManager(num_pools=2, timeout=180, retries=False)
 
     host = 'http://%s:%s'%(hostname, port)
-    url = host+'/api/query_by_assets'
     #url = host+'/api/biz_register'
     #url = host+'/api/biz_contract'
     #url = host+'/api/biz_delivery'
-    #url = host+'/api/query_deals'
+    url = host+'/api/query_deals'
+    #url = host+'/api/query_by_assets'
     #url = host+'/api/query_block'
     #url = host+'/api/query_raw_block'
     #url = host+'/api/test'

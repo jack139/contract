@@ -42,7 +42,7 @@ import (
 */
 
 /* data字段是已序列化的json串，反序列化一下 */
-func unmarshalData(reqData *map[string]interface{}) ([]map[string]interface{}, error) {
+func unmarshalData(reqData *map[string]interface{}, user string) ([]map[string]interface{}, error) {
 	var respData []map[string]interface{}
 
 	//log.Printf("id: %v\n", ((*reqData)["Contract"].([]interface{})[0]).(map[string]interface{})["id"])
@@ -52,6 +52,8 @@ func unmarshalData(reqData *map[string]interface{}) ([]map[string]interface{}, e
 	// 处理data字段
 	for _, item0 := range dataList {
 		item := item0.(map[string]interface{})
+
+		// 检查 data 字段是否正常
 		_, ok := item["data"]
 		if !ok {
 			continue
@@ -59,26 +61,36 @@ func unmarshalData(reqData *map[string]interface{}) ([]map[string]interface{}, e
 		if !strings.HasPrefix(item["data"].(string), "{") {
 			continue
 		}
+
 		var data map[string]interface{}
-		if err := json.Unmarshal([]byte(item["data"].(string)), &data); err != nil {
-			return nil, err
-		}
-		
-		// 处理image 字段，从ipfs读取
-		_, ok = data["image"]
-		if ok && len(data["image"].(string))>0 {
-			image_data, err := ipfs.Get(data["image"].(string))
-			if err!=nil {
+		// 检查query用户是否是相关者
+		if (item["partyA"]!=user) && (item["partyB"]!=user){
+			// 不相关，不返回data数据
+			data = make(map[string]interface{})
+			data["image"] = ""
+		} else {
+			// 相关，解析 data内容			
+			if err := json.Unmarshal([]byte(item["data"].(string)), &data); err != nil {
 				return nil, err
 			}
-			data["image"] = string(image_data)
-		}		
+			
+			// 处理image 字段，从ipfs读取
+			_, ok = data["image"]
+			if ok && len(data["image"].(string))>0 {
+				image_data, err := ipfs.Get(data["image"].(string))
+				if err!=nil {
+					return nil, err
+				}
+				data["image"] = string(image_data)
+			}		
+		}
 
-		//item["data"] = data
-
+		// 建立返回的数据
 		new_item := map[string] interface{} {
 			"id": item["id"],
-			"exchange_id": item["partyA"],
+			"exchange_id": user,
+			"userkey_a": item["partyA"],
+			"userkey_b": item["partyB"],
 			"assets_id": item["contractNo"],
 			"action": item["action"],
 			"type": "DEAL",
@@ -93,7 +105,6 @@ func unmarshalData(reqData *map[string]interface{}) ([]map[string]interface{}, e
 
 
 /* 查询交易， 只允许查询自己的 */
-/*
 func queryDeals(ctx *fasthttp.RequestCtx) {
 	log.Println("query_deals")
 
@@ -114,22 +125,41 @@ func queryDeals(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	// 获取用户密钥
-	me, ok := SECRET_KEY[pubkey]
-	if !ok {
-		respError(ctx, 9011, "wrong userkey")
+	// 准备查询
+	clientCtx, err := client.GetClientTxContext(HttpCmd)
+	if err != nil {
+		respError(ctx, 9002, err.Error())
 		return
 	}
 
-	// 只查询当前用户的交易
-	respBytes, err := me.Query("deal", "_")
-	if err!=nil {
-		respError(ctx, 9001, err.Error())
+	queryClient := types.NewQueryClient(clientCtx)
+
+	params := &types.QueryGetContractByUserRequest{
+		User: pubkey,
+	}
+
+	res, err := queryClient.ContractByUser(context.Background(), params)
+	if err != nil {
+		respError(ctx, 9003, err.Error())
 		return
 	}
+
+	//log.Printf("%t\n", res)
+
+	// 设置 接收输出
+	buf := new(bytes.Buffer)
+	clientCtx.Output = buf
+
+	// 转换输出
+	clientCtx.PrintProto(res)
+
+	// 输出的字节流
+	respBytes := []byte(buf.String())
+
+	log.Println("output: ", buf.String())
 
 	// 转换成map, 生成返回数据
-	var respData []map[string]interface{}
+	var respData map[string]interface{}
 
 	if err := json.Unmarshal(respBytes, &respData); err != nil {
 		respError(ctx, 9004, err.Error())
@@ -137,20 +167,20 @@ func queryDeals(ctx *fasthttp.RequestCtx) {
 	}
 
 	// 处理data字段
-	err = unmarshalData(&respData)
+	respData2, err := unmarshalData(&respData, pubkey)
 	if err!=nil{
 		respError(ctx, 9014, err.Error())
-		return		
+		return
 	}
 
-	// 返回结果
+
 	resp := map[string] interface{} {
-		"deals" : respData,
+		"deals" : respData2,
 	}
 
 	respJson(ctx, &resp)
 }
-*/
+
 
 
 /* 按资产id查询交易 */
@@ -168,11 +198,11 @@ func queryByAsstes(ctx *fasthttp.RequestCtx) {
 	}
 
 	// 检查参数
-	//pubkey, ok := (*reqData)["userkey"].(string)
-	//if !ok {
-	//	respError(ctx, 9009, "need userkey")
-	//	return
-	//}
+	pubkey, ok := (*reqData)["userkey"].(string)
+	if !ok {
+		respError(ctx, 9009, "need userkey")
+		return
+	}
 	assetsId, ok := (*reqData)["assets_id"].(string)
 	if !ok {
 		respError(ctx, 9001, "need assets_id")
@@ -221,7 +251,7 @@ func queryByAsstes(ctx *fasthttp.RequestCtx) {
 	}
 
 	// 处理data字段
-	respData2, err := unmarshalData(&respData)
+	respData2, err := unmarshalData(&respData, pubkey)
 	if err!=nil{
 		respError(ctx, 9014, err.Error())
 		return
