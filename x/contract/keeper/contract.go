@@ -37,7 +37,7 @@ func (k Keeper) SetContractCount(ctx sdk.Context, count int64) {
 }
 
 // CreateContract creates a contract with a new id and update the count
-func (k Keeper) CreateContract(ctx sdk.Context, msg types.MsgCreateContract) {
+func (k Keeper) CreateContract(ctx sdk.Context, msg types.MsgCreateContract) int64 {
 	// Create the contract
 	count := k.GetContractCount(ctx)
 	var contract = types.Contract{
@@ -57,6 +57,8 @@ func (k Keeper) CreateContract(ctx sdk.Context, msg types.MsgCreateContract) {
 
 	// Update contract count
 	k.SetContractCount(ctx, count+1)
+
+	return count
 }
 
 // SetContract set a specific contract in the store

@@ -35,11 +35,12 @@ if __name__ == '__main__':
             'userkey'   : 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', # test2
             #'userkey_a' : 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex',
             #'userkey_b' : 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx',
-            'assets_id' : '1234',
+            #'assets_id' : '1234',
             #'data'      : '11111111111111111111',
             #'user_name' : 'test',
             #'user_type' : 'buyer',
-            #'block_id'  : '5FBFCE2740DAE30C2D960AEC834107D7F823DEDA9C003A0A2A83FECA51FE6D57', # txhash
+            'block_id'  : '21', # id 
+            #'height' : '210274'
         }
     }
 

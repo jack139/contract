@@ -8,7 +8,9 @@ import (
 	//"strconv"
 	"log"
 	"bytes"
+	"strings"
 	"encoding/json"
+	"encoding/hex"
 	//"encoding/base64"
 	"github.com/valyala/fasthttp"
 
@@ -189,14 +191,32 @@ func doContractDelivery(ctx *fasthttp.RequestCtx, action string) {
 		return
 	}
 
-	//fmt.Printf("%s %s\n", respData["height"], respData["txhash"])
+	//fmt.Printf("%s %s\n", respData["height"], respData["data"])
 
-	// 返回两个区块
+	// 从 data 中解析出 id
+	// >>> bytearray.fromhex("0A170A0E437265617465436F6E7472616374120569643A3137").decode()
+	// '\n\x17\n\x0eCreateContract\x12\x05id:17'
+
+    bs, err := hex.DecodeString(respData["data"].(string))
+    if err != nil {
+		respError(ctx, 9013, err.Error())
+		return
+    }
+
+	slice1 := strings.Split(string(bs), "\n")
+	//log.Println(slice1)
+	slice2 := strings.Split(slice1[2], "\x12")
+	//log.Println(slice2)
+	slice3 := strings.Split(slice2[1], ":")
+	log.Println("new: ", slice3)
+
+
+	// 返回区块 信息 
 	resp := map[string] interface{} {
-		"block_a" : respData["txhash"].(string),  // 兼容旧接口
-		"block_b" : respData["txhash"].(string),  // 兼容旧接口
+		"block_a" : slice3[1],  // 兼容旧接口
+		"block_b" : slice3[1],  // 兼容旧接口
+		"data_id" : slice3[1],
 		"height" : respData["height"].(string),
-		"txhash" : respData["txhash"].(string),
 	}
 
 	respJson(ctx, &resp)

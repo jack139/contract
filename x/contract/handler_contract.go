@@ -2,6 +2,7 @@ package contract
 
 import (
 	"fmt"
+	"strconv"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/jack139/contract/x/contract/keeper"
@@ -9,9 +10,12 @@ import (
 )
 
 func handleMsgCreateContract(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateContract) (*sdk.Result, error) {
-	k.CreateContract(ctx, *msg)
+	id := k.CreateContract(ctx, *msg)
 
-	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
+	return &sdk.Result{
+		Events: ctx.EventManager().ABCIEvents(), 
+		Data: []byte("id:"+strconv.FormatInt(id, 10)),
+	}, nil
 }
 
 func handleMsgUpdateContract(ctx sdk.Context, k keeper.Keeper, msg *types.MsgUpdateContract) (*sdk.Result, error) {

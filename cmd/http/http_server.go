@@ -56,7 +56,7 @@ func RunServer(port string/*, userPath string*/) {
 	r.POST("/api/test", doNonthing)
 	r.POST("/api/query_deals", queryDeals)
 	r.POST("/api/query_by_assets", queryByAsstes)
-	//r.POST("/api/query_block", queryBlock)
+	r.POST("/api/query_block", queryBlock)
 	//r.POST("/api/query_raw_block", queryRawBlock)
 	r.POST("/api/biz_contract", bizContract)
 	r.POST("/api/biz_delivery", bizDelivery)
