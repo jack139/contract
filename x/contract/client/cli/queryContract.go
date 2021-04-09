@@ -90,3 +90,31 @@ func CmdShowByNoContract() *cobra.Command {
 
 	return cmd
 }
+
+func CmdShowByUserContract() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "show-by-user [user]",
+		Short: "shows a contract by contract user.",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			params := &types.QueryGetContractByUserRequest{
+				User: args[0],
+			}
+
+			res, err := queryClient.ContractByUser(context.Background(), params)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}

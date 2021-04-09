@@ -59,3 +59,19 @@ func (k Keeper) ContractByNo(c context.Context, req *types.QueryGetContractByNoR
 
 	return &types.QueryGetContractByNoResponse{Contract: contracts}, nil
 }
+
+func (k Keeper) ContractByUser(c context.Context, req *types.QueryGetContractByUserRequest) (*types.QueryGetContractByUserResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	var contracts []*types.Contract
+	ctx := sdk.UnwrapSDKContext(c)
+
+	r := k.GetContractByUser(ctx, req.User)
+	for i, _ := range r{
+		contracts = append(contracts, &r[i])
+	}
+
+	return &types.QueryGetContractByUserResponse{Contract: contracts}, nil
+}

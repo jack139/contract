@@ -126,3 +126,21 @@ func (k Keeper) GetContractByNo(ctx sdk.Context, contractNo string) (msgs []type
 
 	return
 }
+
+// GetAllContract returns all contract with spicific user
+func (k Keeper) GetContractByUser(ctx sdk.Context, user string) (msgs []types.Contract) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.ContractKey))
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefix(types.ContractKey))
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var msg types.Contract
+		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &msg)
+		if (msg.PartyA==user) || (msg.PartyB==user) {
+			msgs = append(msgs, msg)
+		} 
+	}
+
+	return
+}

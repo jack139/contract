@@ -20,8 +20,9 @@ service Query {
 	rpc ContractByNo(QueryGetContractByNoRequest) returns (QueryGetContractByNoResponse) {
 		option (google.api.http).get = "/jack139/contract/contract/contract/{contractNo}";
 	}
-
-
+	rpc ContractByUser(QueryGetContractByUserRequest) returns (QueryGetContractByUserResponse) {
+		option (google.api.http).get = "/jack139/contract/contract/contract/{user}";
+	}
 }
 
 // this line is used by starport scaffolding # 3
@@ -38,6 +39,14 @@ message QueryGetContractByNoRequest {
 }
 
 message QueryGetContractByNoResponse {
+	repeated Contract Contract = 1;
+}
+
+message QueryGetContractByUserRequest {
+	string user = 1;
+}
+
+message QueryGetContractByUserResponse {
 	repeated Contract Contract = 1;
 }
 
