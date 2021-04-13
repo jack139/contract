@@ -2,9 +2,14 @@ package http
 
 import (
 	"github.com/jack139/contract/cmd/ipfs"
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/jack139/contract/x/contract/types"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/codec/legacy"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"errors"
 	"strings"
 	"log"
 	"bytes"
@@ -381,8 +386,43 @@ func queryBlock(ctx *fasthttp.RequestCtx) {
 }
 
 
+/* 获取key信息 */
+func fetchKey(kb keyring.Keyring, keyref string) (keyring.Info, error) {
+	info, err := kb.Key(keyref)
+	if err != nil {
+		accAddr, err := sdk.AccAddressFromBech32(keyref)
+		if err != nil {
+			return info, err
+		}
+
+		info, err = kb.KeyByAddress(accAddr)
+		if err != nil {
+			return info, errors.New("key not found")
+		}
+	}
+	return info, nil
+}
+
+/* 获取区块数据 */
+func getBlock(clientCtx client.Context, height *int64) ([]byte, error) {
+	// get the node
+	node, err := clientCtx.GetNode()
+	if err != nil {
+		return nil, err
+	}
+
+	// header -> BlockchainInfo
+	// header, tx -> Block
+	// results -> BlockResults
+	res, err := node.Block(context.Background(), height)
+	if err != nil {
+		return nil, err
+	}
+
+	return legacy.Cdc.MarshalJSON(res)
+}
+
 /* 指定区块查询交易 */
-/*
 func queryRawBlock(ctx *fasthttp.RequestCtx) {
 	log.Println("query_raw_block")
 
@@ -396,30 +436,43 @@ func queryRawBlock(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
+	var height int64
 	// 检查参数
 	pubkey, ok := (*reqData)["userkey"].(string)
 	if !ok {
 		respError(ctx, 9009, "need userkey")
 		return
 	}
-	blockId, ok := (*reqData)["block_id"].(string)
+	_, ok = (*reqData)["height"].(float64)
 	if !ok {
-		respError(ctx, 9002, "need block_id")
+		respError(ctx, 9002, "need height")
+		return
+	}else {
+		height = int64((*reqData)["height"].(float64))	// 返回整数
+	}
+
+	// 获取 ctx 上下文
+	clientCtx, err := client.GetClientTxContext(HttpCmd)
+	if err != nil {
+		respError(ctx, 9005, err.Error())
 		return
 	}
 
-	// 获取用户密钥
-	me, ok := SECRET_KEY[pubkey]
-	if !ok {
-		respError(ctx, 9011, "wrong userkey")
+	// 检查 用户地址 是否存在
+	_, err = fetchKey(clientCtx.Keyring, pubkey)
+	if err != nil {
+		respError(ctx, 9001, "invalid userkey")
 		return
 	}
 
-	respBytes, err := me.QueryRawBlock(pubkey, blockId)
-	if err!=nil {
-		respError(ctx, 9003, err.Error())
+	// 准备查询
+	respBytes, err := getBlock(clientCtx, &height)
+	if err != nil {
+		respError(ctx, 9006, err.Error())
 		return
 	}
+
+	//log.Printf("%v\n", string(respBytes))
 
 	// 转换成map, 生成返回数据
 	var respData map[string]interface{}
@@ -435,4 +488,3 @@ func queryRawBlock(ctx *fasthttp.RequestCtx) {
 
 	respJson(ctx, &resp)
 }
-*/

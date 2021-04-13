@@ -32,15 +32,16 @@ if __name__ == '__main__':
         'sign_type' : 'SHA256', 
         'data'     : {
             #'userkey'   : 'contract18zfdsjzn8t500qu43cpxhr9szs226r88u8hly9', # user1
-            'userkey'   : 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', # test2
+            #'userkey'   : 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', # test2
+            'userkey'   : 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx',
             #'userkey_a' : 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex',
             #'userkey_b' : 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx',
-            #'assets_id' : '1234',
+            #'assets_id' : '123',
             #'data'      : '11111111111111111111',
             #'user_name' : 'test',
             #'user_type' : 'buyer',
-            'block_id'  : '21', # id 
-            #'height' : '210274'
+            #'block_id'  : '21', # id 
+            'height' : 210274
         }
     }
 
@@ -75,10 +76,10 @@ if __name__ == '__main__':
     #url = host+'/api/biz_register'
     #url = host+'/api/biz_contract'
     #url = host+'/api/biz_delivery'
-    url = host+'/api/query_deals'
+    #url = host+'/api/query_deals'
     #url = host+'/api/query_by_assets'
     #url = host+'/api/query_block'
-    #url = host+'/api/query_raw_block'
+    url = host+'/api/query_raw_block'
     #url = host+'/api/test'
 
     start_time = datetime.now()
