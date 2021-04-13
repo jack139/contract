@@ -223,7 +223,7 @@ func doContractDelivery(ctx *fasthttp.RequestCtx, action string) {
 	slice2 := strings.Split(slice1[2], "\x12")
 	//log.Println(slice2)
 	slice3 := strings.Split(slice2[1], ":")
-	log.Println("new: ", slice3)
+	log.Println("new id: ", slice3[1])
 
 
 	// 返回区块 信息 

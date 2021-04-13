@@ -1,9 +1,11 @@
 package types
 
-const (
-	// 与 config.yml 里一致
-	FaucetAddress = "contract1r5eemlwzz2pnlghlst5x69mmf0jmqmruz6mrxy"
+import (
+	"io/ioutil"
+	"strings"
+)
 
+const (
 	// 交易类型
 	ActionRegister = "10" // 注册
 	ActionContract = "11" // 签合同
@@ -15,3 +17,12 @@ const (
 	RewardDelivery = "3credit" // 合同验收
 )
 
+var FaucetAddress string
+
+func SetFaucetAddress() {
+	f, err := ioutil.ReadFile("faucet.addr")
+    if err != nil {
+        panic("Read faucet.addr FAIL!")
+    }
+    FaucetAddress = strings.TrimSuffix(string(f), "\n")
+}
