@@ -41,7 +41,7 @@ if __name__ == '__main__':
             #'user_name' : 'test',
             #'user_type' : 'buyer',
             #'block_id'  : '21', # id 
-            'height' : '210274'
+            #'height' : '210274'
         }
     }
 
@@ -79,7 +79,8 @@ if __name__ == '__main__':
     #url = host+'/api/query_deals'
     #url = host+'/api/query_by_assets'
     #url = host+'/api/query_block'
-    url = host+'/api/query_raw_block'
+    #url = host+'/api/query_raw_block'
+    url = host+'/api/query_balance'
     #url = host+'/api/test'
 
     start_time = datetime.now()

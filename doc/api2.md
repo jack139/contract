@@ -698,3 +698,59 @@ base64后结果：
 ```
 
 
+
+##### 3.5 查询通证余额
+
+请求URL
+
+> http://<host>:<port>/api/query_balance
+
+请求方式
+
+> POST
+
+输入参数（data字段下）
+
+| 参数    | 类型   | 说明     |
+| ------- | ------ | -------- |
+| userkey | string | 用户公钥 |
+
+返回结果
+
+| 参数 | 类型   | 说明                                    |
+| ---- | ------ | --------------------------------------- |
+| code | int    | 状态代码，0 表示成功，非0 表示出错      |
+| msg  | string | 成功时返回success；出错时，返回出错信息 |
+| data | json   | 通证余额信息                            |
+
+请求示例
+
+```json
+{
+    "version": "1", 
+    "sign_type": "SHA256", 
+    "data": {
+        "userkey": "contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex"
+    }, 
+    "timestamp": 1618295472, 
+    "appid": "4fcf3871f4a023712bec9ed44ee4b709", 
+    "sign_data": "MzI1YzE5ZWFkM2NmNTMzNjFiMWVmYTMwM2ZhZmU2MDQwMWU0NzJkM2QzMDA1OWM1YWI0ZjY5NjUwODQwMzg0ZA=="
+}
+```
+
+返回示例
+
+```json
+{
+    'code': 0, 
+    'data': {
+        'blcok': {
+            'amount': '20',   /* 用户通证数量 */
+            'denom': 'credit' /* 通知单位 */
+        }
+    }, 
+    'msg': 'success'
+}
+```
+
+
