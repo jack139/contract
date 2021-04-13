@@ -32,16 +32,16 @@ if __name__ == '__main__':
         'sign_type' : 'SHA256', 
         'data'     : {
             #'userkey'   : 'contract18zfdsjzn8t500qu43cpxhr9szs226r88u8hly9', # user1
-            #'userkey'   : 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', # test2
-            'userkey'   : 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx',
+            'userkey'   : 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', # test2
+            #'userkey'   : 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx',
             #'userkey_a' : 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex',
             #'userkey_b' : 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx',
-            #'assets_id' : '123',
-            #'data'      : '11111111111111111111',
+            #'assets_id' : '12345678',
+            #'data'      : 'abcdefghijklmn',
             #'user_name' : 'test',
             #'user_type' : 'buyer',
             #'block_id'  : '21', # id 
-            'height' : 210274
+            'height' : '210274'
         }
     }
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     body['sign_data'] = signature_str
 
     body = json.dumps(body)
-    #print(body)
+    print(body)
 
     pool = urllib3.PoolManager(num_pools=2, timeout=180, retries=False)
 

@@ -6,15 +6,13 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"errors"
 	"strings"
 	"log"
 	"bytes"
 	"encoding/json"
 	"context"
+	"strconv"
 	"github.com/valyala/fasthttp"
 )
 
@@ -164,13 +162,21 @@ func queryDeals(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	// 准备查询
+	// 准备环境
 	clientCtx, err := client.GetClientTxContext(HttpCmd)
 	if err != nil {
 		respError(ctx, 9002, err.Error())
 		return
 	}
 
+	// 检查 用户地址 是否存在
+	_, err = fetchKey(clientCtx.Keyring, pubkey)
+	if err != nil {
+		respError(ctx, 9001, "invalid userkey")
+		return
+	}
+
+	// 准备查询
 	queryClient := types.NewQueryClient(clientCtx)
 
 	params := &types.QueryGetContractByUserRequest{
@@ -243,17 +249,25 @@ func queryByAsstes(ctx *fasthttp.RequestCtx) {
 	}
 	assetsId, ok := (*reqData)["assets_id"].(string)
 	if !ok {
-		respError(ctx, 9001, "need assets_id")
+		respError(ctx, 9008, "need assets_id")
 		return
 	}
 
-	// 准备查询
+	// 准备环境
 	clientCtx, err := client.GetClientTxContext(HttpCmd)
 	if err != nil {
 		respError(ctx, 9002, err.Error())
 		return
 	}
 
+	// 检查 用户地址 是否存在
+	_, err = fetchKey(clientCtx.Keyring, pubkey)
+	if err != nil {
+		respError(ctx, 9001, "invalid userkey")
+		return
+	}
+
+	// 准备查询
 	queryClient := types.NewQueryClient(clientCtx)
 
 	params := &types.QueryGetContractByNoRequest{
@@ -329,13 +343,21 @@ func queryBlock(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	// 准备查询
+	// 准备环境
 	clientCtx, err := client.GetClientTxContext(HttpCmd)
 	if err != nil {
 		respError(ctx, 9005, err.Error())
 		return
 	}
 
+	// 检查 用户地址 是否存在
+	_, err = fetchKey(clientCtx.Keyring, pubkey)
+	if err != nil {
+		respError(ctx, 9001, "invalid userkey")
+		return
+	}
+
+	// 准备查询
 	queryClient := types.NewQueryClient(clientCtx)
 
 	params := &types.QueryGetContractRequest{
@@ -386,22 +408,7 @@ func queryBlock(ctx *fasthttp.RequestCtx) {
 }
 
 
-/* 获取key信息 */
-func fetchKey(kb keyring.Keyring, keyref string) (keyring.Info, error) {
-	info, err := kb.Key(keyref)
-	if err != nil {
-		accAddr, err := sdk.AccAddressFromBech32(keyref)
-		if err != nil {
-			return info, err
-		}
 
-		info, err = kb.KeyByAddress(accAddr)
-		if err != nil {
-			return info, errors.New("key not found")
-		}
-	}
-	return info, nil
-}
 
 /* 获取区块数据 */
 func getBlock(clientCtx client.Context, height *int64) ([]byte, error) {
@@ -436,19 +443,22 @@ func queryRawBlock(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	var height int64
 	// 检查参数
 	pubkey, ok := (*reqData)["userkey"].(string)
 	if !ok {
 		respError(ctx, 9009, "need userkey")
 		return
 	}
-	_, ok = (*reqData)["height"].(float64)
+	height, ok := (*reqData)["height"].(string)
 	if !ok {
 		respError(ctx, 9002, "need height")
 		return
-	}else {
-		height = int64((*reqData)["height"].(float64))	// 返回整数
+	}
+
+	height64, err := strconv.ParseInt(height, 10, 64)
+	if err != nil {
+		respError(ctx, 9007, err.Error())
+		return		
 	}
 
 	// 获取 ctx 上下文
@@ -466,7 +476,7 @@ func queryRawBlock(ctx *fasthttp.RequestCtx) {
 	}
 
 	// 准备查询
-	respBytes, err := getBlock(clientCtx, &height)
+	respBytes, err := getBlock(clientCtx, &height64)
 	if err != nil {
 		respError(ctx, 9006, err.Error())
 		return

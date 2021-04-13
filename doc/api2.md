@@ -2,11 +2,12 @@
 
 
 
-| 修改日期   | 修改内容                       |
-| ---------- | ------------------------------ |
-| 2021-01-15 | 增加企业链业务处理接口 biz_*   |
-| 2021-01-26 | 增加ipfs支持                   |
-| 2021-03-26 | biz_register返回增加密码字符串 |
+| 修改日期   | 修改内容                                                     |
+| ---------- | ------------------------------------------------------------ |
+| 2021-01-15 | 增加企业链业务处理接口 biz_*                                 |
+| 2021-01-26 | 增加ipfs支持                                                 |
+| 2021-03-26 | biz_register返回增加密码字符串                               |
+| 2021-04-13 | query查询返回新增内容；query_raw_block查询输入参数改为height |
 
 
 
@@ -255,7 +256,7 @@ base64后结果：
 | ---- | ---------------- | --------------------------------------- |
 | code | int              | 状态代码，0 表示成功，非0 表示出错      |
 | msg  | string           | 成功时返回success；出错时，返回出错信息 |
-| data | json | 区块id                              |
+| data | json | 交易数据id |
 
 请求示例
 
@@ -264,13 +265,14 @@ base64后结果：
     "version": "1", 
     "sign_type": "SHA256", 
     "data": {
-        "userkey_a": "qyBsXnVKKjvFNxHBRudc3tCp8t8ymqBSF1Ga8qlfqFs=", 
-        "userkey_b": "j9cIgmm17x0aLApf0i20UR7Pj34Ua/JwyWOuBGgYIFg=", 
-        "assets_id": "123", 
-        "data": "zzzzz"
-    }, "timestamp": 1610690910, 
+        "userkey_a": "contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex", 
+        "userkey_b": "contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx", 
+        "assets_id": "12345678", 
+        "data": "abcdefghijklmn"
+    }, 
+    "timestamp": 1618284612, 
     "appid": "4fcf3871f4a023712bec9ed44ee4b709", 
-    "sign_data": "ZWE3Y2YyMzVlODVlZDg1MTUyYjNhNzZjMzAwYTlmN2ViYTk2ZDcxMWExYTUyOGU5ODI5NzhhNmZiYjFkZjBiNA=="
+    "sign_data": "ZDYwNjdiOTI1NzBmMzIxYmM2NjZmNjc5ZTY5YjVkYzhlMzk1NjBiYTJmOTlhOGE1ZTBiY2U4ZmFlMWU3MDAxYw=="
 }
 ```
 
@@ -280,12 +282,9 @@ base64后结果：
 {
     'code': 0, 
     'data': {
-        'block_a': {
-            'id': '002b12e5-5df8-4265-92b5-45d492dcf99c'
-        }, 
-        'block_b': {
-            'id': '67da3edd-ea41-4255-82b4-4fb6f4b5d84c'
-        }
+        'block_a': '22', 
+        'block_b': '22', 
+        'height': '217319', /* 区块高度，用于查询raw block */
     }, 
     'msg': 'success'
 }
@@ -327,14 +326,14 @@ base64后结果：
     "version": "1", 
     "sign_type": "SHA256", 
     "data": {
-        "userkey_a": "qyBsXnVKKjvFNxHBRudc3tCp8t8ymqBSF1Ga8qlfqFs=", 
-        "userkey_b": "j9cIgmm17x0aLApf0i20UR7Pj34Ua/JwyWOuBGgYIFg=", 
-        "assets_id": "123", 
-        "data": "zzzzz"
+        "userkey_a": "contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex", 
+        "userkey_b": "contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx", 
+        "assets_id": "12345678", 
+        "data": "abcdefghijklmn"
     }, 
-    "timestamp": 1610691004, 
+    "timestamp": 1618284657, 
     "appid": "4fcf3871f4a023712bec9ed44ee4b709", 
-    "sign_data": "OTRmNTQyNDRmM2JhNGM0YWEyNDM1MDI0MWM3ZDc1ZWQ4YWU0OTIwNjlhZmRlMWNiODMyNzBkNTUyYjFmYWE3OA=="
+    "sign_data": "ZTk2ZWNjYmQ1Zjk1ZTUzZGFlYzUxODRlOTBjNTg1ZWY3ZjI4YzgxYmQ1MmUwYmRhYjUwNWJlODE4NWExZDgyNA=="
 }
 ```
 
@@ -344,12 +343,10 @@ base64后结果：
 {
     'code': 0, 
     'data': {
-        'block_a': {
-            'id': 'ad7a7961-f2db-4c1f-8112-52e8dee55478'
-        }, 
-        'block_b': {
-            'id': '76a709f0-1b75-4ea2-b645-7d54eaead6e1'
-        }
+        'block_a': '23', 
+        'block_b': '23', 
+        'data_id': '23', 
+        'height': '217364', /* 区块高度，用于查询raw block */
     }, 
     'msg': 'success'
 }
@@ -390,34 +387,48 @@ base64后结果：
     "version": "1", 
     "sign_type": "SHA256", 
     "data": {
-        "pubkey": "qyBsXnVKKjvFNxHBRudc3tCp8t8ymqBSF1Ga8qlfqFs=", 
+        "userkey": "contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex"
     }, 
-    "timestamp": 1609384428, 
-    "appid": "dec213b6aced0336932e272f3faaf9e4", 
-    "sign_data": "N2IzZTBjOGE1NzZlMDM4YjY0Zjg2Y2YwN2NlMjc4ZjdjNWQyYjdkYWI4N2UyYWNmMDg1Y2E2M2YzYWYxMGMzNA=="
+    "timestamp": 1618284714, 
+    "appid": "4fcf3871f4a023712bec9ed44ee4b709", 
+    "sign_data": "ZmI5Y2VmNzE2NjFhYjczODdiZmNlNzU1ZTUxOTA4MmFkYjk4MDI2M2VhYWMzNDkxODUxYTBmYzhmMzA0N2ZkZQ=="
 }
+
 ```
 
 返回示例
 
 ```json
 {
-    "code": 0, 
-    "data": {
-        "deals": [
+    'code': 0, 
+    'data': {
+        'deals': [
             {
-                "action": 1, 
-                "assets_id": "123", 
-                "image": "zzzzz", 
-                "exchange_id": "qyBsXnVKKjvFNxHBRudc3tCp8t8ymqBSF1Ga8qlfqFs=", 
-                "id": "59534f7d-db5b-4792-8937-09996638c3d4", 
-                "refer": "zzzzz", 
-                "send_time": "2020-12-31T03:06:48.535213018Z", 
-                "type": "DEAL"
+                'action': '11', 
+                'assets_id': '1234', 
+                'data': {'image': '11111111111111111111'}, 
+                'exchange_id': 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', 
+                'id': '13', 
+                'refer': '', 
+                'type': 'DEAL', 
+                'userkey_a': 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', 
+                'userkey_b': 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx'
+            }, 
+            {
+                'action': '12', 
+                'assets_id': '1234', 
+                'data': {
+                    'image': '11111111111111111111'}, 
+                'exchange_id': 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', 
+                'id': '18', 
+                'refer': '', 
+                'type': 'DEAL', 
+                'userkey_a': 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', 
+                'userkey_b': 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx'
             }
         ]
     }, 
-    "msg": "success"
+    'msg': 'success'
 }
 ```
 
@@ -457,12 +468,12 @@ base64后结果：
     "version": "1", 
     "sign_type": "SHA256", 
     "data": {
-        "pubkey": "qyBsXnVKKjvFNxHBRudc3tCp8t8ymqBSF1Ga8qlfqFs=", 
-        "assets_id": "123"
+        "userkey": "contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex", 
+        "assets_id": "12345678"
     }, 
-    "timestamp": 1609384684, 
-    "appid": "dec213b6aced0336932e272f3faaf9e4", 
-    "sign_data": "YTg4NjliYjA3NzA5NmE3YzRmNTBmODc4OGM3ZGMyNzUzN2JjYjlmM2VkNjkyOTdiZjljMzExNDEzMzRkZjgwMQ=="
+    "timestamp": 1618284759, 
+    "appid": "4fcf3871f4a023712bec9ed44ee4b709", 
+    "sign_data": "M2VlNDhjMjgxMmY0Y2E4YzMwZjUyYmJmZTE0MzY0YWYzNDNkZWU4MGQ5Y2Y1YTg5ZThiNjkyZDI4ZTUxMjE3OA=="
 }
 ```
 
@@ -470,22 +481,36 @@ base64后结果：
 
 ```json
 {
-    "code": 0, 
-    "data": {
-        "deals": [
+    'code': 0, 
+    'data': {
+        'deals': [
             {
-                "action": 1, 
-                "assets_id": "123", 
-                "image": "zzzzz", 
-                "exchange_id": "qyBsXnVKKjvFNxHBRudc3tCp8t8ymqBSF1Ga8qlfqFs=", 
-                "id": "59534f7d-db5b-4792-8937-09996638c3d4", 
-                "refer": "zzzzz", 
-                "send_time": "2020-12-31T03:06:48.535213018Z", 
-                "type": "DEAL"
+                'action': '11', 
+                'assets_id': '12345678', 
+                'data': {'image': 'abcdefghijklmn'}, 
+                'exchange_id': 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', 
+                'id': '22', 
+                'refer': '', 
+                'type': 'DEAL', 
+                'userkey_a': 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', 
+                'userkey_b': 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx'
+            }, 
+            {
+                'action': '12', 
+                'assets_id': '12345678', 
+                'data': {
+                    'image': 'abcdefghijklmn'
+                }, 
+                'exchange_id': 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', 
+                'id': '23', 
+                'refer': '', 
+                'type': 'DEAL', 
+                'userkey_a': 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', 
+                'userkey_b': 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx'
             }
         ]
     }, 
-    "msg": "success"
+    'msg': 'success'
 }
 ```
 
@@ -527,12 +552,12 @@ base64后结果：
     "version": "1", 
     "sign_type": "SHA256", 
     "data": {
-        "pubkey": "qyBsXnVKKjvFNxHBRudc3tCp8t8ymqBSF1Ga8qlfqFs=", 
-		"block_id": "59534f7d-db5b-4792-8937-09996638c3d4"
+        "userkey": "contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex", 
+        "block_id": "21"
     }, 
-    "timestamp": 1609385156, 
-    "appid": "dec213b6aced0336932e272f3faaf9e4", 
-    "sign_data": "ZDRlZTcyNWJiYjRmOGEzMjJiMjE2ZDY2ZGJiMjQ1MzQwZTgwNTVlZDI5N2NjOThkMTE5YWJlNjJhYmVkYjEwOQ=="
+    "timestamp": 1618284796, 
+    "appid": "4fcf3871f4a023712bec9ed44ee4b709", 
+    "sign_data": "YWY2YmY0ZmYzMjJmOTE5YzVjOTg0YWQ0Zjk3NjQ1MzE5YzMyOWMzOThlN2ZjZWU1YmM2MjQwOWFjNTUxNDg5NQ=="
 }
 ```
 
@@ -540,20 +565,21 @@ base64后结果：
 
 ```json
 {
-    "code": 0, 
-    "data": {
-        "blcok": {
-            "action": 1, 
-            "assets_id": "123", 
-            "image": "zzzzz", 
-            "exchange_id": "qyBsXnVKKjvFNxHBRudc3tCp8t8ymqBSF1Ga8qlfqFs=", 
-            "id": "59534f7d-db5b-4792-8937-09996638c3d4", 
-            "refer": "zzzzz", 
-            "send_time": "2020-12-31T03:06:48.535213018Z", 
-            "type": "DEAL"
+    'code': 0, 
+    'data': {
+        'deals': {
+            'action': '12', 
+            'assets_id': '1234', 
+            'data': {'image': '11111111111111111111'}, 
+            'exchange_id': 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', 
+            'id': '21', 
+            'refer': '', 
+            'type': 'DEAL', 
+            'userkey_a': 'contract1lanrvzxd99xy00zjgxfjm5pdqhs5jv6h5z9mex', 
+            'userkey_b': 'contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx'
         }
     }, 
-    "msg": "success"
+    'msg': 'success'
 }
 ```
 
@@ -571,10 +597,10 @@ base64后结果：
 
 输入参数（data字段下）
 
-| 参数     | 类型   | 说明     |
-| -------- | ------ | -------- |
-| userkey  | string | 用户公钥 |
-| block_id | string | 区块ID   |
+| 参数    | 类型   | 说明     |
+| ------- | ------ | -------- |
+| userkey | string | 用户公钥 |
+| height  | string | 区块高度 |
 
 返回结果
 
@@ -595,12 +621,12 @@ base64后结果：
     "version": "1", 
     "sign_type": "SHA256", 
     "data": {
-        "pubkey": "qyBsXnVKKjvFNxHBRudc3tCp8t8ymqBSF1Ga8qlfqFs=", 
-        "block_id": "59534f7d-db5b-4792-8937-09996638c3d4"
+        "userkey": "contract1ghfcl0hm5pxu0q0jgnl2nw3hhmrkklgyh3lgvx", 
+        "height": '210274'
     }, 
-    "timestamp": 1609385186, 
-    "appid": "dec213b6aced0336932e272f3faaf9e4", 
-    "sign_data": "Yjg0ZGQzNmRlYjFhNTIwMTFlMTExYzM2NjUyNTlkYzcyOTEwNTljYTUwYmEzMGJlYzUxMTdmMTYwOThhMzQ2NA=="
+    "timestamp": 1618284344, 
+    "appid": "4fcf3871f4a023712bec9ed44ee4b709", 
+    "sign_data": "OWMxZDZlMGYxNDY2Y2Q1YWQyN2JlZGQzYzcxY2Y0ZGNlYmNmOTBmODRjNjM5MzA4ZmYyZDg0MWY2Y2FlZTFjYQ=="
 }
 ```
 
@@ -608,64 +634,66 @@ base64后结果：
 
 ```json
 {
-    "code": 0, 
-    "data": {
-        "blcok": {
-            "data": {
-                "txs": [
-                    "eyJTaWduYXR1cmUiOiJ5aVFNTGx6bXp3TGZmR2NxMitiajY0OUlDVmU3cHlaVXUwYVhmYTN4eTdjYktFMm43UWg0WW5TdTNERVNtRFUrNFRLWVQrdGt1QWVjSStmUE5lQ3VCZz09IiwiU2VuZFRpbWUiOiIyMDIwLTEyLTMxVDAzOjA2OjQ4LjUzNTIxMzAxOFoiLCJTaWduUHViS2V5Ijp7InR5cGUiOiJlZDI1NTE5L3B1YmtleSIsInZhbHVlIjoiYm5nUm9FdzFRTCsyUzNRYUtFMlZwdG9zUzJqWXJRbHZkVFIxdE9vZkZVTT0ifSwiUGF5bG9hZCI6eyJ0eXBlIjoiZGVhbCIsInZhbHVlIjp7IklEIjoiV1ZOUGZkdGJSNUtKTndtWlpqakQxQT09IiwiQXNzZXRzSUQiOiJNVEl6IiwiRXhjaGFuZ2VJRCI6InF5QnNYblZLS2p2Rk54SEJSdWRjM3RDcDh0OHltcUJTRjFHYThxbGZxRnM9IiwiRGF0YSI6IkIveVBSMVFIUkZwaU0rVk9DMVlsVDFtOENsd2VRTk1yQlcwTHUxbzlBWlBGNGlQM2NSZGdzZ1dxL0t1ZSIsIlJlZmVyIjoiZW5wNmVubz0iLCJBY3Rpb24iOjF9fX0="
-                ]
-            }, 
-            "evidence": {
-                "evidence": []
-            }, 
-            "header": {
-                "app_hash": "0000000000000000", 
-                "chain_id": "test-chain-mu6R5U", 
-                "consensus_hash": "048091BC7DDC283F77BFBF91D73C44DA58C3DF8A9CBC867405D8B7F3DAADA22F", 
-                "data_hash": "BCD0AF5B8CA23DA3949962C459553057B1C58ADFDEF742850E91F5976C9B1EE0", 
-                "evidence_hash": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855", 
-                "height": "3", 
-                "last_block_id": {
-                    "hash": "DA6997132D77FB664891184ED1769D423913F9D735096155F546F04FD80C2D07", 
-                    "parts": {
-                        "hash": "0FE0A68DED7CA1952D8E0C14FF00D21E88835E0061FFE6E854C6BDEBECBAF2E3", 
-                       	"total": 1
-                    }
+    'code': 0, 
+    'data': {
+        'blcok': {
+            'block': {
+                'data': {
+                    'txs': ['Co0CCooCCiwvamFjazEzOS5jb250cmFjdC5jb250cmFjdC5Nc2dDcmVhdGVDb250cmFjdBLZAQovY29udHJhY3QxOHpmZHNqem44dDUwMHF1NDNjcHhocjlzenMyMjZyODh1OGhseTkSBDEyMzQaL2NvbnRyYWN0MWxhbnJ2enhkOTl4eTAwempneGZqbTVwZHFoczVqdjZoNXo5bWV4Ii9jb250cmFjdDFnaGZjbDBobTVweHUwcTBqZ25sMm53M2hobXJra2xneWgzbGd2eCoCMTIyOnsiaW1hZ2UiOiJRbVFXdVg3bXdFNUxEdGpja2M3M3ZpV1o3TEJpVTRnRW5YcXRKdkMyN1JSUnlZIn0SWApQCkYKHy9jb3Ntb3MuY3J5cHRvLnNlY3AyNTZrMS5QdWJLZXkSIwohA/6+qwsJW0bHd0OaCqa2Mfxr1lRQGE9NtS/+66lG9EO7EgQKAggBGAMSBBDAmgwaQAbZAl1RUh8EdAAWDWqx+MKKPrZ9JRW0PxgdTAdVWKT1OE8xw3Cq3wuUiuTCAajsEmCKjKeqcvz3UJC5eL1O93U=']
                 }, 
-                "last_commit_hash": "094D0C3196022282C0AE5816B54C03C2832003C631AE709E8C87AE0254FBA7C2", 
-                "last_results_hash": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855", 
-                "next_validators_hash": "B1CD94B2455ADA3D2A90EF23C42827C7F341597C1507468B54D2FC3C92CDD4FC", 
-                "proposer_address": "0B9CE4D58B9ECFEF233551D7EDA6346360D72C03", 
-                "time": "2020-12-31T03:06:04.660214065Z", 
-                "validators_hash": "B1CD94B2455ADA3D2A90EF23C42827C7F341597C1507468B54D2FC3C92CDD4FC", 
-                "version": {
-                    "app": "1", 
-                    "block": "11"
+                'evidence': {'evidence': None}, 
+                'header': {
+                    'app_hash': '767B1E1A1F42FB08187284E3831E4065AE42F2EA04C55B7EE84C8856E95BECD0', 
+                    'chain_id': 'contract', 
+                    'consensus_hash': '048091BC7DDC283F77BFBF91D73C44DA58C3DF8A9CBC867405D8B7F3DAADA22F', 
+                    'data_hash': '71FC654A49D737F32092B64E32DE7569A072EAAEEB0DC0E4C2C16331D0672414', 
+                    'evidence_hash': 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855', 
+                    'height': '210274', 
+                    'last_block_id': {
+                        'hash': '4BB4962E7A1462DC665A888652652D652C21E24DF994E9260578093C8F7794A5', 
+                        'parts': {
+                            'hash': '35C561892C4B3F789D0AA714F8B62EBA1AE97B1A2106523C20F91111021CB3D0', 
+                            'total': 1
+                        }
+                    }, 
+                    'last_commit_hash': '3654C6C1A7BB84C44FFDCE14ACD2F3983FA4BE6678E13B99ED890845C1709E66', 
+                    'last_results_hash': 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855', 
+                    'next_validators_hash': '98B670043EDB03D07C4096C7DE5BC389EA11DB382A7E501F4635F7B73482C078', 
+                    'proposer_address': '627C9E0096F61C1A40A980781B38B3CFC7B32E93', 
+                    'time': '2021-04-09T09:03:37.86117745Z', 
+                    'validators_hash': '98B670043EDB03D07C4096C7DE5BC389EA11DB382A7E501F4635F7B73482C078', 
+                    'version': {'block': '11'}
+                }, 
+                'last_commit': {
+                    'block_id': {
+                        'hash': '4BB4962E7A1462DC665A888652652D652C21E24DF994E9260578093C8F7794A5', 
+                        'parts': {
+                            'hash': '35C561892C4B3F789D0AA714F8B62EBA1AE97B1A2106523C20F91111021CB3D0', 
+                            'total': 1
+                        }
+                    }, 
+                    'height': '210273', 
+                    'round': 0, 
+                    'signatures': [
+                        {
+                            'block_id_flag': 2, 
+                            'signature': 'SwbBqVdczrfxTrvwCCUykvl2ZBM48MYyaGsYFirj4MksyWLI9hZSOMoHjKQqB7BxeDXaPbjqpyUBSsxHTWfbBw==', 
+                            'timestamp': '2021-04-09T09:03:37.86117745Z', 
+                            'validator_address': '627C9E0096F61C1A40A980781B38B3CFC7B32E93'
+                        }
+                    ]
                 }
             }, 
-            "last_commit": {
-                "block_id": {
-                    "hash": "DA6997132D77FB664891184ED1769D423913F9D735096155F546F04FD80C2D07", 
-                    "parts": {
-                        "hash": "0FE0A68DED7CA1952D8E0C14FF00D21E88835E0061FFE6E854C6BDEBECBAF2E3", 
-                        "total": 1
-                    }
-                }, 
-                "height": "2", 
-                "round": 0, 
-                "signatures": [
-                    {
-                        "block_id_flag": 2, 
-                        "signature": "wBbAoBO+ODWkxZoGsPs1nnMBbOifQl7PZtSXcLHSLHIyIpTfncx1W6W4YoBwW7CMbzjkBvMh2sQlKyvvIG5jBA==", 
-                        "timestamp": "2020-12-31T03:06:04.660214065Z", 
-                        "validator_address": "0B9CE4D58B9ECFEF233551D7EDA6346360D72C03"
-                    }
-                ]
+            'block_id': {
+                'hash': '3691B91FC6B22CB271AC0B20135200112716605F57F8C85C609FE4C2908011B1', 
+                'parts': {
+                    'hash': 'E2B3B49B97634892FD230C05F2D6116055070BF1043DE57C8C32C19647E19194', 
+                    'total': 1
+                }
             }
         }
     }, 
-    "msg": "success"
+    'msg': 'success'
 }
 ```
 

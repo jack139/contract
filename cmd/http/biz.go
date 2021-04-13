@@ -126,12 +126,33 @@ func doContractDelivery(ctx *fasthttp.RequestCtx, action string) {
 		return		
 	}
 
+
+	// 获取 ctx 上下文
+	clientCtx, err := client.GetClientTxContext(HttpCmd)
+	if err != nil {
+		respError(ctx, 9009, err.Error())
+		return
+	}
+
+	// 检查 用户地址 是否存在
+	_, err = fetchKey(clientCtx.Keyring, pubkeyA)
+	if err != nil {
+		respError(ctx, 9021, "invalid userkeyA")
+		return
+	}
+	_, err = fetchKey(clientCtx.Keyring, pubkeyB)
+	if err != nil {
+		respError(ctx, 9021, "invalid userkeyB")
+		return
+	}
+
+
 	// data 存 ipfs
 	var cid string
 	if len(data)>0 {
 		cid, err = ipfs.Add([]byte(data))
 		if err!=nil {
-			respError(ctx, 9012, err.Error())
+			respError(ctx, 9013, err.Error())
 			return
 		}
 	} else {
@@ -149,12 +170,6 @@ func doContractDelivery(ctx *fasthttp.RequestCtx, action string) {
 	}
 
 	// 数据上链
-	clientCtx, err := client.GetClientTxContext(HttpCmd)
-	if err != nil {
-		respError(ctx, 9009, err.Error())
-		return
-	}
-
 	msg := types.NewMsgCreateContract(clientCtx.GetFromAddress().String(), 
 						assetsId, pubkeyA, pubkeyB, action, string(loadBytes))
 	if err := msg.ValidateBasic(); err != nil {
@@ -215,7 +230,6 @@ func doContractDelivery(ctx *fasthttp.RequestCtx, action string) {
 	resp := map[string] interface{} {
 		"block_a" : slice3[1],  // 兼容旧接口
 		"block_b" : slice3[1],  // 兼容旧接口
-		"data_id" : slice3[1],
 		"height" : respData["height"].(string),
 	}
 

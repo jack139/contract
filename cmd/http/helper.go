@@ -3,6 +3,7 @@ package http
 import (
 	//"xchainge/client"
 
+	"errors"
 	"fmt"
 	"sort"
 	"strconv"
@@ -14,6 +15,9 @@ import (
 	//"crypto/md5"
 	//"io/ioutil"
 	"github.com/valyala/fasthttp"
+
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
@@ -164,4 +168,22 @@ func getMapKeys(m map[string]interface{}) *[]string {
 		keys = append(keys, k)
 	}
 	return &keys
+}
+
+
+/* 获取key信息 */
+func fetchKey(kb keyring.Keyring, keyref string) (keyring.Info, error) {
+	info, err := kb.Key(keyref)
+	if err != nil {
+		accAddr, err := sdk.AccAddressFromBech32(keyref)
+		if err != nil {
+			return info, err
+		}
+
+		info, err = kb.KeyByAddress(accAddr)
+		if err != nil {
+			return info, errors.New("key not found")
+		}
+	}
+	return info, nil
 }
