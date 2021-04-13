@@ -330,7 +330,7 @@ func New(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.contractKeeper = *contractkeeper.NewKeeper(
-		appCodec, keys[contracttypes.StoreKey], keys[contracttypes.MemStoreKey],
+		appCodec, keys[contracttypes.StoreKey], keys[contracttypes.MemStoreKey], app.BankKeeper,
 	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition

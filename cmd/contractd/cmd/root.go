@@ -33,7 +33,9 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+
 	"github.com/jack139/contract/app"
+	//myclient "github.com/jack139/contract/cmd/client"
 	// this line is used by starport scaffolding # stargate/root/import
 )
 
@@ -73,6 +75,8 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		flags.FlagChainID:        ChainID,
 		flags.FlagKeyringBackend: "test",
 	})
+
+	//_ = myclient.GetFaucetAddress(rootCmd)
 
 	return rootCmd, encodingConfig
 }

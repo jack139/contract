@@ -52,7 +52,7 @@ func bizRegister(ctx *fasthttp.RequestCtx) {
 	//referrer, _ := (*reqData)["referrer"].(string)
 
 	// 生成新用户密钥
-	address, mnemonic, err := cmdclient.AddUserAccount(HttpCmd, userName)
+	address, mnemonic, err := cmdclient.AddUserAccount(HttpCmd, userName, types.RewardRegister)
 	if err != nil{
 		respError(ctx, 9009, err.Error())
 		return		
@@ -73,14 +73,14 @@ func bizRegister(ctx *fasthttp.RequestCtx) {
 /* 签合同 */
 func bizContract(ctx *fasthttp.RequestCtx) {
 	log.Println("biz_contract")
-	doContractDelivery(ctx, "11")
+	doContractDelivery(ctx, types.ActionContract)
 }
 
 
 /* 验收 */
 func bizDelivery(ctx *fasthttp.RequestCtx) {
 	log.Println("biz_delivery")
-	doContractDelivery(ctx, "12")
+	doContractDelivery(ctx, types.ActionDelivery)
 }
 
 

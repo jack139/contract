@@ -5,16 +5,52 @@ import (
 	"strconv"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
 	"github.com/jack139/contract/x/contract/keeper"
 	"github.com/jack139/contract/x/contract/types"
 )
 
+
 func handleMsgCreateContract(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateContract) (*sdk.Result, error) {
 	id := k.CreateContract(ctx, *msg)
 
+	// 通证奖励
+	var reward string
+	switch msg.Action {
+		case types.ActionContract:
+			reward = types.RewardContract
+		case types.ActionDelivery:
+			reward = types.RewardDelivery
+		default:
+			reward = "0credit"
+	}
+
+	// 生成 faucet 地址
+	faucetAcct, err := sdk.AccAddressFromBech32(types.FaucetAddress)
+	if err != nil {
+		return nil, err
+	}
+	userAcctA, err := sdk.AccAddressFromBech32(msg.PartyA)
+	if err != nil {
+		return nil, err
+	}
+	userAcctB, err := sdk.AccAddressFromBech32(msg.PartyB)
+	if err != nil {
+		return nil, err
+	}
+	// 生成金额
+	payment, _ := sdk.ParseCoinsNormalized(reward)
+	// 转账
+	if err := k.CoinKeeper.SendCoins(ctx, faucetAcct, userAcctA, payment); err != nil {
+		return nil, err
+	}
+	if err := k.CoinKeeper.SendCoins(ctx, faucetAcct, userAcctB, payment); err != nil {
+		return nil, err
+	}
+
 	return &sdk.Result{
 		Events: ctx.EventManager().ABCIEvents(), 
-		Data: []byte("id:"+strconv.FormatInt(id, 10)),
+		Data: []byte("id:"+strconv.FormatInt(id, 10)), // id 作为data返回
 	}, nil
 }
 

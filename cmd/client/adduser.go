@@ -13,15 +13,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/cosmos/cosmos-sdk/client/tx"
+
+	"github.com/jack139/contract/x/contract/types"
 )
 
 
 // 建新用户 user， 建key，建account
 // 返回： address, mnemonic
-func AddUserAccount(cmd *cobra.Command, name string) (string, string, error) {
-	
+func AddUserAccount(cmd *cobra.Command, name string, reward string) (string, string, error) {
 	clientCtx, err := client.GetClientTxContext(cmd)
 	if err != nil {
 		return "", "", err
@@ -37,7 +37,8 @@ func AddUserAccount(cmd *cobra.Command, name string) (string, string, error) {
 	}
 	kb, err = keyring.New(sdk.KeyringServiceName(), keyringBackend, clientCtx.KeyringDir, buf)
 
-	// 获取 user0的地址
+	/*
+	// 获取 faucet 的地址
 	keyref := "faucet"
 	info0, err := kb.Key(keyref)
 	if err != nil {
@@ -54,8 +55,9 @@ func AddUserAccount(cmd *cobra.Command, name string) (string, string, error) {
 	// 取得地址字符串： 例如 contract1zfqgxtujvpy92prtzgmzs3ygta9y2cl3w8hxlh
 	addr0 := ko.Address
 	//fmt.Println(addr0)
+	*/
 
-	cmd.Flags().Set(flags.FlagFrom, addr0)
+	cmd.Flags().Set(flags.FlagFrom, types.FaucetAddress)
 	clientCtx, err = client.GetClientTxContext(cmd) // 设置了addr0, 重新获取一次context
 	if err != nil {
 		return "", "", err
@@ -97,10 +99,10 @@ func AddUserAccount(cmd *cobra.Command, name string) (string, string, error) {
 	toAddr := info.GetAddress()
 
 	//fmt.Println("from ", clientCtx.GetFromAddress())
-	//fmt.Println("to ", toAddr)
+	//fmt.Printf("to %T %v\n", toAddr, toAddr)
 
 	// 转账 1credit， 会自动建立auth的账户
-	coins, err := sdk.ParseCoinsNormalized("20credit")
+	coins, err := sdk.ParseCoinsNormalized(reward)
 	if err != nil {
 		return "", "", err
 	}
@@ -123,4 +125,44 @@ func AddUserAccount(cmd *cobra.Command, name string) (string, string, error) {
 	// 调用 send 的 RPC 服务
 	return addr_new, mnemonic, tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 
+}
+
+// 返回 faucet 的 地址
+func GetFaucetAddress(cmd *cobra.Command) string {
+	clientCtx, err := client.GetClientTxContext(cmd)
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+
+	// 获取 keyring 环境
+	var kb keyring.Keyring
+
+	buf := bufio.NewReader(cmd.InOrStdin())
+	keyringBackend, err := cmd.Flags().GetString(flags.FlagKeyringBackend)
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+	kb, err = keyring.New(sdk.KeyringServiceName(), keyringBackend, clientCtx.KeyringDir, buf)
+
+	// 获取 faucet 的地址
+	keyref := "faucet"
+	info0, err := kb.Key(keyref)
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+
+	// 参考cosmos-sdk/client/keys/show.go 中 getBechKeyOut()
+	ko, err := keyring.Bech32KeyOutput(info0)  
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+
+	fmt.Println(ko.Address)
+	
+	// 取得地址字符串： 例如 contract1zfqgxtujvpy92prtzgmzs3ygta9y2cl3w8hxlh
+	return ko.Address
 }

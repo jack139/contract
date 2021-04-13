@@ -207,7 +207,7 @@ func AddUserCmd(defaultNodeHome string) *cobra.Command {
 		Long: `Add a user to chain. `,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, _, err := cmdclient.AddUserAccount(cmd, args[0])
+			_, _, err := cmdclient.AddUserAccount(cmd, args[0], "1credit")
 			return err
 		},
 	}

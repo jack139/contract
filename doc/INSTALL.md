@@ -17,7 +17,7 @@ contractd start --log_level warn
 
 ### 启动http服务
 ```bash
-contractd http 8888 --chain-id contract
+contractd http 8888 --chain-id contract --from user0
 ```
 
 ### 安装ipfs
