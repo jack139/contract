@@ -7,7 +7,8 @@
 | 2021-01-15 | 增加企业链业务处理接口 biz_*                                 |
 | 2021-01-26 | 增加ipfs支持                                                 |
 | 2021-03-26 | biz_register返回增加密码字符串                               |
-| 2021-04-13 | query查询返回新增内容；query_raw_block查询输入参数改为height |
+| 2021-04-13 | query_* 查询结果返回新增内容；**query_raw_block查询输入参数改为height** |
+| 2021-04-14 | 增加查询通证余额 query_balance                               |
 
 
 
@@ -82,6 +83,7 @@
 |  5   | query_by_assets | 按合同编号进行查询历史交易   |
 |  6   | query_block     | 按区块ID查询指定区块         |
 |  7   | query_raw_block | 按区块ID查询指定区块原始数据 |
+|  8   | query_balance   | 查询通证余额                 |
 
 
 
@@ -746,7 +748,7 @@ base64后结果：
     'data': {
         'blcok': {
             'amount': '20',   /* 用户通证数量 */
-            'denom': 'credit' /* 通知单位 */
+            'denom': 'credit' /* 通证单位 */
         }
     }, 
     'msg': 'success'
