@@ -6,9 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cosmos/cosmos-sdk/snapshots"
-	"github.com/jack139/contract/app/params"
-
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -16,6 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
+	"github.com/cosmos/cosmos-sdk/snapshots"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"
@@ -33,7 +31,11 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+
+	"github.com/jack139/contract/app/params"
 	"github.com/jack139/contract/app"
+	mytypes "github.com/jack139/contract/x/contract/types"
+	myclient "github.com/jack139/contract/cmd/client"
 	// this line is used by starport scaffolding # stargate/root/import
 )
 
@@ -60,6 +62,13 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		Use:   app.Name + "d",
 		Short: "Stargate CosmosHub App",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			// 初始化 faucet 的地址
+			faucetAddr, err := myclient.GetAddrStr(cmd, "faucet")
+			if err != nil {
+				return err
+			}
+			mytypes.FaucetAddress = faucetAddr
+
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}

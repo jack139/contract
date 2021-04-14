@@ -1,10 +1,5 @@
 package types
 
-import (
-	"io/ioutil"
-	"strings"
-)
-
 const (
 	// 交易类型
 	ActionRegister = "10" // 注册
@@ -18,11 +13,3 @@ const (
 )
 
 var FaucetAddress string
-
-func SetFaucetAddress() {
-	f, err := ioutil.ReadFile("faucet.addr")
-    if err != nil {
-        panic("Read faucet.addr FAIL!")
-    }
-    FaucetAddress = strings.TrimSuffix(string(f), "\n")
-}

@@ -37,8 +37,8 @@ if __name__ == '__main__':
             'userkey_b' : 'contract1d2cq2a2f604mahf20hdv7453tqedh7mzhmz97c',
             'assets_id' : '12345678',
             'data'      : 'abcdefghijklmn',
-            #'user_name' : 'test2',
-            #'user_type' : 'buyer',
+            'user_name' : 'test16',
+            'user_type' : 'buyer',
             #'block_id'  : '21', # id 
             #'height' : '210274'
         }
@@ -72,8 +72,8 @@ if __name__ == '__main__':
     pool = urllib3.PoolManager(num_pools=2, timeout=180, retries=False)
 
     host = 'http://%s:%s'%(hostname, port)
-    #url = host+'/api/biz_register'
-    url = host+'/api/biz_contract'
+    url = host+'/api/biz_register'
+    #url = host+'/api/biz_contract'
     #url = host+'/api/biz_delivery'
     #url = host+'/api/query_deals'
     #url = host+'/api/query_by_assets'

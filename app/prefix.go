@@ -2,7 +2,6 @@ package app
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/jack139/contract/x/contract/types"
 )
 
 const (
@@ -23,7 +22,4 @@ func SetConfig() {
 	config.SetBech32PrefixForValidator(ValidatorAddressPrefix, ValidatorPubKeyPrefix)
 	config.SetBech32PrefixForConsensusNode(ConsNodeAddressPrefix, ConsNodePubKeyPrefix)
 	config.Seal()
-
-	// 设置 faucet 地址
-	types.SetFaucetAddress()
 }

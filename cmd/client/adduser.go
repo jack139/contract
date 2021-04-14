@@ -2,7 +2,7 @@ package client
 
 import (
 	"bufio"
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 
@@ -18,10 +18,10 @@ import (
 	"github.com/jack139/contract/x/contract/types"
 )
 
-
 // 建新用户 user， 建key，建account
 // 返回： address, mnemonic
 func AddUserAccount(cmd *cobra.Command, name string, reward string) (string, string, error) {
+	cmd.Flags().Set(flags.FlagFrom, types.FaucetAddress) // 设置 faucet 地址，用于转账
 	clientCtx, err := client.GetClientTxContext(cmd)
 	if err != nil {
 		return "", "", err
@@ -36,32 +36,6 @@ func AddUserAccount(cmd *cobra.Command, name string, reward string) (string, str
 		return "", "", err
 	}
 	kb, err = keyring.New(sdk.KeyringServiceName(), keyringBackend, clientCtx.KeyringDir, buf)
-
-	/*
-	// 获取 faucet 的地址
-	keyref := "faucet"
-	info0, err := kb.Key(keyref)
-	if err != nil {
-		return "", "", err
-	}
-	//addr0 := info0.GetAddress()
-
-	// 参考cosmos-sdk/client/keys/show.go 中 getBechKeyOut()
-	ko, err := keyring.Bech32KeyOutput(info0)  
-	if err != nil {
-		return "", "", err
-	}
-
-	// 取得地址字符串： 例如 contract1zfqgxtujvpy92prtzgmzs3ygta9y2cl3w8hxlh
-	addr0 := ko.Address
-	//fmt.Println(addr0)
-	*/
-
-	cmd.Flags().Set(flags.FlagFrom, types.FaucetAddress)
-	clientCtx, err = client.GetClientTxContext(cmd) // 设置了addr0, 重新获取一次context
-	if err != nil {
-		return "", "", err
-	}
 
 	// 注册新的 key
 	keyringAlgos, _ := kb.SupportedAlgorithms()
@@ -92,14 +66,11 @@ func AddUserAccount(cmd *cobra.Command, name string, reward string) (string, str
 		return "", "", err
 	}
 
-	fmt.Println("mnemonic: ", mnemonic)
-	//fmt.Println(info)
+	log.Println("mnemonic: ", mnemonic)
+	//log.Println(info)
 
 	// 新用户的 地址
 	toAddr := info.GetAddress()
-
-	//fmt.Println("from ", clientCtx.GetFromAddress())
-	//fmt.Printf("to %T %v\n", toAddr, toAddr)
 
 	// 转账 1credit， 会自动建立auth的账户
 	coins, err := sdk.ParseCoinsNormalized(reward)
@@ -111,7 +82,6 @@ func AddUserAccount(cmd *cobra.Command, name string, reward string) (string, str
 	if err := msg.ValidateBasic(); err != nil {
 		return "", "", err
 	}
-
 
 	// 参考cosmos-sdk/client/keys/show.go 中 getBechKeyOut()
 	ko_new, err := keyring.Bech32KeyOutput(info)  
@@ -125,4 +95,39 @@ func AddUserAccount(cmd *cobra.Command, name string, reward string) (string, str
 	// 调用 send 的 RPC 服务
 	return addr_new, mnemonic, tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 
+}
+
+/* 通过key name获取地址 */
+func GetAddrStr(cmd *cobra.Command, keyref string) (string, error) {
+	clientCtx, err := client.GetClientTxContext(cmd)
+	if err != nil {
+		return "", err
+	}
+
+	// 获取 keyring 环境
+	var kb keyring.Keyring
+
+	buf := bufio.NewReader(cmd.InOrStdin())
+	// keyringBackend 直接使用 test
+	kb, err = keyring.New(sdk.KeyringServiceName(), "test", clientCtx.KeyringDir, buf)
+
+	// 获取 地址
+	//keyref := "faucet"
+	info0, err := kb.Key(keyref)
+	if err != nil {
+		return "", err
+	}
+	//addr0 := info0.GetAddress() // AccAddress
+
+	// 参考cosmos-sdk/client/keys/show.go 中 getBechKeyOut()
+	ko, err := keyring.Bech32KeyOutput(info0)  
+	if err != nil {
+		return "", err
+	}
+
+	// 取得地址字符串： 例如 contract1zfqgxtujvpy92prtzgmzs3ygta9y2cl3w8hxlh
+	addr0 := ko.Address
+	//fmt.Println(addr0)
+
+	return addr0, nil
 }
