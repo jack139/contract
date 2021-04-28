@@ -64,10 +64,11 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// 初始化 faucet 的地址
 			faucetAddr, err := myclient.GetAddrStr(cmd, "faucet")
-			if err != nil {
-				return err
+			if err == nil {
+				// 第一次初始化网络时会找不到 "faucet"
+				// 因此需要在初始化网络后，再次启动网络
+				mytypes.FaucetAddress = faucetAddr
 			}
-			mytypes.FaucetAddress = faucetAddr
 
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
