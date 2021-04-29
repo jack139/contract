@@ -32,12 +32,12 @@ if __name__ == '__main__':
         'sign_type' : 'SHA256', 
         'data'     : {
             #'userkey'   : 'contract1rsnyvzy9rdtwj807jnmxp2qlf9zg65kzk2fayu', # test1
-            #'userkey'   : 'contract1d2cq2a2f604mahf20hdv7453tqedh7mzhmz97c', # test2
+            'userkey'   : 'contract102jrlhhvruu6cnj24esrksd3e04analjcnn7tp', # test2
             'userkey_a' : 'contract1rsnyvzy9rdtwj807jnmxp2qlf9zg65kzk2fayu',
             'userkey_b' : 'contract1d2cq2a2f604mahf20hdv7453tqedh7mzhmz97c',
             'assets_id' : '12345678',
             'data'      : 'abcdefghijklmn',
-            'user_name' : 'test16',
+            'user_name' : 'test1',
             'user_type' : 'buyer',
             #'block_id'  : '21', # id 
             #'height' : '210274'
@@ -72,14 +72,14 @@ if __name__ == '__main__':
     pool = urllib3.PoolManager(num_pools=2, timeout=180, retries=False)
 
     host = 'http://%s:%s'%(hostname, port)
-    url = host+'/api/biz_register'
+    #url = host+'/api/biz_register'
     #url = host+'/api/biz_contract'
     #url = host+'/api/biz_delivery'
     #url = host+'/api/query_deals'
     #url = host+'/api/query_by_assets'
     #url = host+'/api/query_block'
     #url = host+'/api/query_raw_block'
-    #url = host+'/api/query_balance'
+    url = host+'/api/query_balance'
     #url = host+'/api/test'
 
     start_time = datetime.now()

@@ -1,25 +1,22 @@
 #!/bin/sh
 
-CHAIN_DIR="/root/xchainge"
+CHAIN_DIR="/root/contract"
 CHAIN_BIN=$CHAIN_DIR"/build"
-CHAIN_USERS=$CHAIN_DIR"/users"
-LOG_PATH="/var/log/xchainge"
+LOG_PATH="/var/log/contract"
 
 start_back() {
-	nohup $CHAIN_BIN/"xchain" node --home n1 2>&1 > $LOG_PATH"/n1.log" &
-	nohup $CHAIN_BIN/"xchain" node --home n2 2>&1 > $LOG_PATH"/n2.log" &
-	nohup $CHAIN_BIN/"xcli" http 8888 $CHAIN_USERS 2>&1 > $LOG_PATH"/http.log" &
+	nohup $CHAIN_BIN/"contractd" start --log_level warn --home n1 2>&1 > $LOG_PATH"/n1.log" &
+	nohup $CHAIN_BIN/"contractd" http 8000 --chain-id contract --from user0 --home n1 2>&1 > $LOG_PATH"/http.log" &
 	return 0 
 }
 
 stop_back() {
-	kill -9 `pgrep -f "xcli"`
-	kill -9 `pgrep -f "xchain"`
+	kill -9 `pgrep -f "contractd"`
 	return 0
 }
 
 status() {
-	ps -f -C nginx -C xchain -C xcli
+	ps -f -C nginx -C contractd
 	return 0
 }
 

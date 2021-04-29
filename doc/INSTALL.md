@@ -7,7 +7,7 @@ GOPATH=$HOME/Codes/go starport build
 
 ### 第一次启动
 ```bash
-GOPATH=$HOME/Codes/go starport serv
+GOPATH=$HOME/Codes/go starport serve
 ```
 
 ### 后续启动
